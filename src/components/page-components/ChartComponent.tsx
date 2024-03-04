@@ -67,7 +67,6 @@ const ChartComponent = () => {
       //   tvWidget.remove();
       // };
       initOnReady('https://demo-feed-data.tradingview.com');
-      setIsChartReady(true);
     },[])
   return (
     <section className='flex-grow'>
