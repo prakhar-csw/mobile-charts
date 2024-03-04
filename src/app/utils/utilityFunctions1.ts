@@ -1,8 +1,4 @@
-import { ChartingLibraryWidgetOptions, LanguageCode, ResolutionString, widget } from "../../../public/charting_library";
-
-
-import TradingView from '../../../public/charting_library/charting_library';
-import {UDFCompatibleDatafeed} from '../../../public/datafeeds/udf';
+import { ChartingLibraryWidgetOptions, ResolutionString, widget } from "../../../public/charting_library";
 
 export const getParameterByName = (name:string):string => {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");

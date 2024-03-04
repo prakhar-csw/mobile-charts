@@ -1,7 +1,9 @@
+// 'use client';
 import Script from "next/script";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,8 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Script strategy="beforeInteractive" src="charting_library/charting_library.standalone.js" />
-		  <Script strategy="beforeInteractive" src="datafeeds/udf/dist/bundle.js" />
+      <Head>
+        <Script strategy="lazyOnload" src="charting_library/charting_library.standalone.js" />
+      </Head>
       <body className={inter.className}>{children}</body>
     </html>
   );

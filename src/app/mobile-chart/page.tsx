@@ -1,13 +1,19 @@
 import ButtonContainer from '@/components/page-components/ButtonContainer';
-import ChartComponent from '@/components/page-components/ChartComponent';
+import dynamic from 'next/dynamic';
+import Script from 'next/script';
+
+const ChartComponent = dynamic(() => import('@/components/page-components/ChartComponent'), {
+  ssr: true,
+})
 
 const page = () => {
   return (
     <main className='h-full flex flex-col'>
-        <ChartComponent/>
-        <ButtonContainer/>
-	</main>
+      <Script strategy="beforeInteractive" src="datafeeds/udf/dist/bundle.js" />
+      <ChartComponent/>
+      <ButtonContainer/>
+	  </main>
   )
 }
 
-export default page
+export default page;
