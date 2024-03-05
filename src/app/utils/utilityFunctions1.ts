@@ -1,5 +1,7 @@
 import { ChartingLibraryWidgetOptions, ResolutionString, widget } from "../../../public/charting_library";
 
+let tvWidget: any = null;
+
 export const getParameterByName = (name:string):string => {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
@@ -21,7 +23,7 @@ export const initOnReady = (datafeedUrl:string):void => {
         container: "tv_chart_container",
         autosize:true,
         datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(
-            "https://demo_feed.tradingview.com",
+            datafeedUrl,
             undefined,
             {
                 maxResponseLength: 1000,
@@ -40,7 +42,7 @@ export const initOnReady = (datafeedUrl:string):void => {
         theme:<any> getParameterByName('theme'),
     };
 
-    const tvWidget = new widget(widgetOptions);
+    tvWidget = new widget(widgetOptions);
     tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
             const button = tvWidget.createButton();
@@ -61,3 +63,8 @@ export const initOnReady = (datafeedUrl:string):void => {
     });
     window.frames[0].focus();
 };
+
+export const removeWhenExit = ()=>{
+    if(tvWidget)
+        tvWidget.remove();
+}
