@@ -21,6 +21,7 @@ const ChartHOC: React.FC<ChartHOCProps> = (props) => {
   },[])
 
   return chart.renderUI();
+  
 }
 
 
