@@ -1,5 +1,5 @@
 import React from "react";
-import { initOnReady, removeWhenExit } from "./utilityFunctions1";
+import { initOnReady, removeWhenExit } from "./utilityFunctions";
 
 interface ChartModule {
     // isAlreadyInitialized?:boolean,
