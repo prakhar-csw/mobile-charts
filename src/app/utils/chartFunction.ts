@@ -1,5 +1,5 @@
 import React from "react";
-import { initOnReady } from "./utilityFunctions1";
+import { initOnReady, removeWhenExit } from "./utilityFunctions1";
 
 interface ChartModule {
     // isAlreadyInitialized?:boolean,
@@ -30,7 +30,7 @@ export const createChartModule = (): ChartModule =>{
         },
 
         remove: function() : void {
-            // removeWhenExit();
+            removeWhenExit();
         }
     }
     return ChartModule;
