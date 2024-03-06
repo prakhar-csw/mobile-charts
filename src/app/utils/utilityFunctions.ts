@@ -9,16 +9,17 @@ export const getParameterByName = (name:string):string => {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
   };
 
-export const initOnReady = (datafeedUrl:string):void => {
-    // var datafeedUrl = "https://demo-feed-data.tradingview.com";
-    var customDataUrl = getParameterByName('dataUrl');
+export const initOnReady = (datafeedUrl:string, assetSymbol:string):void => {
+    const customDataUrl = getParameterByName('dataUrl');
+    console.log('curds : ', datafeedUrl )
+
     if (customDataUrl !== "") {
         datafeedUrl = customDataUrl.startsWith('https://') ? customDataUrl : `https://${customDataUrl}`;
     }
 
     const widgetOptions: ChartingLibraryWidgetOptions = {
         fullscreen: false,
-        symbol: 'AAPL',
+        symbol: assetSymbol,
         interval: '1D' as ResolutionString,
         container: "tv_chart_container",
         autosize:true,
@@ -42,7 +43,10 @@ export const initOnReady = (datafeedUrl:string):void => {
         theme:<any> getParameterByName('theme'),
     };
 
+
+
     tvWidget = new widget(widgetOptions);
+    console.log('tvWidget: ',tvWidget)
     tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
             const button = tvWidget.createButton();

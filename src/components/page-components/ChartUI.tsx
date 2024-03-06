@@ -1,37 +1,46 @@
 'use client';
-import { createChartModule } from "@/app/utils/chartFunction";
-import ChartContext from "@/app/utils/context/ChartContext";
-import React, { useEffect } from "react";
-
-interface ChartHOCProps {
-  dataFeedUrl: string,
-};
-
-// HOC
-const ChartHOC: React.FC<ChartHOCProps> = (props) => {
-  const chart = createChartModule();
-  
-  useEffect(()=>{
-    chart.init(props.dataFeedUrl);
-    chart.dataFeed();
-
-    return ()=>{
-      chart.remove();
-    }
-  },[])
-
-  return chart.renderUI();
-  
-}
-
+import React, { useState, useEffect } from "react";
+import ChartHOC from "./ChartHOC";
+import { ChartContext } from "@/app/utils/context/ChartContext";
 
 // Prodiver
 const ChartUI = (props: any) => {
+  const [ assetSymbol, setAssetSymbol ] = useState<string>('');
+
+  useEffect(() => {
+
+    // window.addEventListener("message", (event) => {
+    //   console.log(`Received message: ${event.data}`);
+    //   setAssetSymbol(event.data || 'TATAMOTOTRS'); 
+    // });
+
+    setAssetSymbol('TATA');
+  }, []);
+
+  // useEffect(()=>{
+  //   const fetchData = async (assetSymbol: string) => {
+  //     try {
+  //       const responseFromHistoryAPI = await fetch(`/api/history?symbol=${assetSymbol}`);
+  //       const responseFromSymbolsAPI = await fetch(`/api/symbols?symbol=${assetSymbol}`);
+
+  //       const result1 = await responseFromHistoryAPI.json();
+  //       const result2 = await responseFromSymbolsAPI.json();
+
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+
+  //   if(assetSymbol)
+  //     fetchData(assetSymbol);
+
+  // },[assetSymbol])
+
   return (
-    <ChartContext.Provider value={{}}>
-      <ChartHOC dataFeedUrl={props.dataFeedUrl}/>
+    <ChartContext.Provider value={undefined}>
+      <ChartHOC dataFeedUrl={props.dataFeedUrl} assetSymbol={assetSymbol}/>
     </ChartContext.Provider>
   )
-}
+};
 
 export default ChartUI;
