@@ -11,7 +11,6 @@ export const getParameterByName = (name:string):string => {
 
 export const initOnReady = (datafeedUrl:string, assetSymbol:string):void => {
     const customDataUrl = getParameterByName('dataUrl');
-    console.log('curds : ', datafeedUrl )
 
     if (customDataUrl !== "") {
         datafeedUrl = customDataUrl.startsWith('https://') ? customDataUrl : `https://${customDataUrl}`;
@@ -43,10 +42,7 @@ export const initOnReady = (datafeedUrl:string, assetSymbol:string):void => {
         theme:<any> getParameterByName('theme'),
     };
 
-
-
     tvWidget = new widget(widgetOptions);
-    console.log('tvWidget: ',tvWidget)
     tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
             const button = tvWidget.createButton();

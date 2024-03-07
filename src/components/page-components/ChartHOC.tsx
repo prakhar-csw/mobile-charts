@@ -1,6 +1,6 @@
 
 
-import { createChartModule2, ChartModule } from "@/app/utils/chartFunction";
+import { createChartModule, ChartModule } from "@/app/utils/chartFunction";
 import { ChartContext } from "@/app/utils/context/ChartContext";
 import React, { useContext, useEffect } from "react";
 
@@ -11,7 +11,7 @@ interface ChartHOCProps {
 };
 
 const ChartHOC: React.FC<ChartHOCProps> = (props) => {
-    const chart = new (createChartModule2 as any);
+    const chart = new (createChartModule as any);
 
     useEffect(()=> {
         if(!props.assetSymbol)
