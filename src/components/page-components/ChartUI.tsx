@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import ChartHOC from "./ChartHOC";
 import { ChartContext } from "@/app/utils/context/ChartContext";
 
+import { DUMMY_SYMBOL } from "@/app/utils/constants";
+
 // Prodiver
 const ChartUI = (props: any) => {
   const [ assetSymbol, setAssetSymbol ] = useState<string>('');
@@ -14,7 +16,7 @@ const ChartUI = (props: any) => {
     //   setAssetSymbol(event.data || 'TATAMOTOTRS'); 
     // });
 
-    setAssetSymbol('TATA');
+    setAssetSymbol(DUMMY_SYMBOL);
   }, []);
 
   // useEffect(()=>{

@@ -1998,12 +1998,43 @@ export const getResponse = () =>{
       }
 };
 
-export async function GET (request: NextRequest,{params}:{ params: { slug: string } } ){
+export async function GET (request: NextRequest){
     const symbol = request.nextUrl.searchParams.get('symbol') || '';
+    const from = request.nextUrl.searchParams.get('from') || '';
+    const to = request.nextUrl.searchParams.get('to') || '';
+    const resolution = request.nextUrl.searchParams.get('resolution') || '';
+    const countback = request.nextUrl.searchParams.get('countback') || '';
+
+    // const res2 = await getDataFromBE();
+    // res2['s'] = 'ok';
+
     if(!symbol){
         return NextResponse.json({
             err : 'Please provide the symbol',
         });
     }
+
+    // return NextResponse.json(res2);
     return NextResponse.json(getResponse());
 }
+
+
+const getDataFromBE = async () =>{
+  const body = {
+    startmin: 40,
+    endmin: 0,
+  };
+
+  const response = await fetch('https://ie-uat.coinswitch.co/cskservices-market/tick', {
+    method: 'POST',
+    headers: {
+      Accept: 'application.json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body),
+    cache: 'default'
+  });
+  const resultFromBE = await response.json();
+  // console.log(' length c: ',resultFromBE.c.length)
+  return resultFromBE;
+};
