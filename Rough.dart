@@ -2112,7 +2112,7 @@ curl 'localhost:3000/api/history?symbol=AAPL&resolution=1D&from=1708863994&to=17
 
 
 
-// Chart configuration : https://www.tradingview.com/charting-library-docs/latest/ui_elements/Chart
+// Chart configuration : https://www.tradingview.com/charting-library-docs/latest/ui_elements/Chart - disabled_features: [],
 
 
 //Need data from BE
@@ -2152,3 +2152,6 @@ curl 'localhost:3000/api/history?symbol=AAPL&resolution=1D&from=1708863994&to=17
   type: 'stock',
   pricescale:100
 }
+
+
+// https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.ChartingLibraryWidgetOptions/

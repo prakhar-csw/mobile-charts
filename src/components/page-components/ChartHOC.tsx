@@ -1,8 +1,7 @@
 
 
 import { createChartModule, ChartModule } from "@/app/utils/chartFunction";
-import { ChartContext } from "@/app/utils/context/ChartContext";
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 
 
 interface ChartHOCProps {

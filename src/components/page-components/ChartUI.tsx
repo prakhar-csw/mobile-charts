@@ -19,25 +19,6 @@ const ChartUI = (props: any) => {
     setAssetSymbol(DUMMY_SYMBOL);
   }, []);
 
-  // useEffect(()=>{
-  //   const fetchData = async (assetSymbol: string) => {
-  //     try {
-  //       const responseFromHistoryAPI = await fetch(`/api/history?symbol=${assetSymbol}`);
-  //       const responseFromSymbolsAPI = await fetch(`/api/symbols?symbol=${assetSymbol}`);
-
-  //       const result1 = await responseFromHistoryAPI.json();
-  //       const result2 = await responseFromSymbolsAPI.json();
-
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
-
-  //   if(assetSymbol)
-  //     fetchData(assetSymbol);
-
-  // },[assetSymbol])
-
   return (
     <ChartContext.Provider value={undefined}>
       <ChartHOC dataFeedUrl={props.dataFeedUrl} assetSymbol={assetSymbol}/>

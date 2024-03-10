@@ -1,65 +1,22 @@
-import {NextRequest, NextResponse} from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+/**
+ * This api is responsible for creating the configuration for the trading view chart.
+ * It is an important api if removed chart might not load.
+ */
+
 
 const getConfigData = () => {
-    return {
-        "supports_search": true,
-        "supports_group_request": false,
-        "supports_marks": true,
-        "supports_timescale_marks": true,
-        "supports_time": true,
-        "exchanges": [
-          {
-            "value": "",
-            "name": "All Exchanges",
-            "desc": ""
-          },
-          {
-            "value": "NasdaqNM",
-            "name": "NasdaqNM",
-            "desc": "NasdaqNM"
-          },
-          {
-            "value": "NYSE",
-            "name": "NYSE",
-            "desc": "NYSE"
-          },
-          {
-            "value": "NCM",
-            "name": "NCM",
-            "desc": "NCM"
-          },
-          {
-            "value": "NGM",
-            "name": "NGM",
-            "desc": "NGM"
-          }
-        ],
-        "symbols_types": [
-          {
-            "name": "All types",
-            "value": ""
-          },
-          {
-            "name": "Stock",
-            "value": "stock"
-          },
-          {
-            "name": "Index",
-            "value": "index"
-          }
-        ],
-        supported_resolutions: [
-          "D",
-          "2D",
-          "3D",
-          "W",
-          "3W",
-          "M",
-          "6M"
-        ]
-      }
+  return {
+    supports_search: true,
+    supports_group_request: false,
+    supports_marks: false,
+    supports_timescale_marks: false,
+    supports_time: false,
+    supported_resolutions: ["D", "2D", "3D", "W", "3W", "M", "6M"],
+  };
 };
 
-export async function GET (request: NextRequest){
-    return NextResponse.json(getConfigData());
-};
+export async function GET(request: NextRequest) {
+  return NextResponse.json(getConfigData());
+}
