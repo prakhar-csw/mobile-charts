@@ -1,5 +1,3 @@
-
-
 import { createChartModule, ChartModule } from "@/app/utils/chartFunction";
 import React, { useEffect } from "react";
 
@@ -8,9 +6,8 @@ interface ChartHOCProps {
     dataFeedUrl: string,
     assetSymbol: string,
 };
-
 const ChartHOC: React.FC<ChartHOCProps> = (props) => {
-    const chart = new (createChartModule as any);
+    const chart = new (createChartModule as any)();
 
     useEffect(()=> {
         if(!props.assetSymbol)
