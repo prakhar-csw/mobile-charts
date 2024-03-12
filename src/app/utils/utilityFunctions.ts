@@ -1,17 +1,3 @@
-import { PeriodParams } from "./../../../public/charting_library/datafeed-api.d";
-
-import DataFeed from '../utils/datafeed';
-import {
-    AvailableSaveloadVersions,
-  ChartingLibraryFeatureset,
-  ChartingLibraryWidgetOptions,
-  IBasicDataFeed,
-  ResolutionString,
-  widget,
-} from "../../../public/charting_library";
-
-let tvWidget: any = null;
-
 export const getParameterByName = (name: string): string => {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
   const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
@@ -21,64 +7,23 @@ export const getParameterByName = (name: string): string => {
     : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
-export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
-  const customDataUrl = getParameterByName("dataUrl");
 
-  if (customDataUrl !== "") {
-    datafeedUrl = customDataUrl.startsWith("https://")
-      ? customDataUrl
-      : `https://${customDataUrl}`;
+export const areArraysEqualLength = (...arrays: any[][]): boolean => {
+  if (arrays.length < 2) {
+    // At least two arrays are required for comparison
+    throw new Error('At least two arrays are required for comparison.');
   }
 
-  const widgetOptions: ChartingLibraryWidgetOptions = {
-    //Widget configuration
-    container: "tv_chart_container" as string,
-    library_path: "charting_library/" as string,
+  const firstArrayLength = arrays[0].length;
 
-    // Chart Configuration
-    symbol: assetSymbol as string,
-    interval: "1D" as ResolutionString,
-    locale: <any>getParameterByName("lang") || "en" as string,
-    // timezone: "Asia/Kolkata",
+  for (let i = 1; i < arrays.length; i++) {
+    if (arrays[i].length !== firstArrayLength) {
+      return false; // Arrays have different lengths
+    }
+  }
 
-    // Data configuration
-    // datafeed: DataFeed as any,
-    datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(
-      datafeedUrl,
-      "10000",
-      {
-        maxResponseLength: 200,
-        expectedOrder: "latestFirst",
-      }
-    ) as IBasicDataFeed,
-
-    // Chart Size
-    fullscreen: false as boolean,
-    autosize: true as boolean,
-
-    // UI configuration
-    theme: <any>getParameterByName("theme") || "dark" as string,
-
-    // Chart features
-    disabled_features: ["use_localstorage_for_settings"] as ChartingLibraryFeatureset[],
-    enabled_features: ["study_templates"] as ChartingLibraryFeatureset[],
-
-    // Saving and loading chart
-    charts_storage_url: "https://saveloadctradingview.com" as string,
-    charts_storage_api_version: "1.1" as AvailableSaveloadVersions,
-    client_id: "tradingview.com" as string,
-    user_id: "public_user_id" as string,
-  };
-
-  tvWidget = new widget(widgetOptions);
-
-  tvWidget.onChartReady(function() {});
-  window.frames[0].focus();
-};
-
-export const removeWhenExit = () => {
-  if (tvWidget) tvWidget.remove();
-};
+  return true; // All arrays have equal lengths
+}
 
 export const convertEpochToDateTime = (epochTime: string): string => {
   const epochTimeInNumber = parseInt(epochTime);

@@ -1,4 +1,6 @@
+import { SUPPORTED_RESOLUTIONS } from "@/app/utils/constants";
 import { NextRequest, NextResponse } from "next/server";
+
 
 /**
  * This api is responsible for creating the configuration for the trading view chart.
@@ -8,15 +10,22 @@ import { NextRequest, NextResponse } from "next/server";
 
 const getConfigData = () => {
   return {
+    // currency_codes: ["INR"],
+    // exchanges:[],
+    // supported_resolutions:[],
+    supports_marks: false,
+    supports_time: false,
+    supports_timescale_marks: false,
+    // supports_timescale_marks: false,
+    // symbols_grouping:{},
+    // symbols_types:[]
+    // unit:{},
     supports_search: true,
     supports_group_request: false,
-    supports_marks: false,
-    supports_timescale_marks: false,
-    supports_time: false,
-    supported_resolutions: ["D", "2D", "3D", "W", "3W", "M", "6M"],
+    supported_resolutions: SUPPORTED_RESOLUTIONS,
   };
 };
 
 export async function GET(request: NextRequest) {
   return NextResponse.json(getConfigData());
-}
+};

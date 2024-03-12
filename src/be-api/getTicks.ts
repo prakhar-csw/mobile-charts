@@ -1,5 +1,4 @@
 export const getTicks = async (symbol: string, start: string, end: string, interval: string) => {
-
     const url = "https://ie-uat.coinswitch.co/cskservices-market/chart";
     const body = {   
         request: {
@@ -23,9 +22,7 @@ export const getTicks = async (symbol: string, start: string, end: string, inter
       });
 
     const responseData = await response.json();
-    const ticksInfo = responseData;
-
-    console.log('ticks Info : ',ticksInfo);
+    const ticksInfo = responseData.response;
 
     return ticksInfo;
  };

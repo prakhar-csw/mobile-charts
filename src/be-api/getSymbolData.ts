@@ -23,7 +23,6 @@ export const getSymbolData = async (symbol: string) => {
 
     const responseData = await response.json();
     const stockInfo = responseData?.response?.data?.symbolList?.[0] || null;
-
     return stockInfo;
   } catch (error) {
     console.error('Error happened while fetching the data');

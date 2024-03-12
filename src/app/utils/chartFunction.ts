@@ -1,5 +1,5 @@
 import React from "react";
-import { initOnReady, removeWhenExit } from "./utilityFunctions";
+import { initOnReady, removeWhenExit } from "../../../src/app/utils";
 
 export interface ChartModule {
     dataFeedUrl: string,
