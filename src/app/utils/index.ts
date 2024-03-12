@@ -4,7 +4,9 @@ import {
   ChartingLibraryFeatureset,
   ChartingLibraryWidgetOptions,
   IBasicDataFeed,
+  LanguageCode,
   ResolutionString,
+  ThemeName,
   widget,
 } from "../../../public/charting_library";
 
@@ -13,13 +15,6 @@ import { getParameterByName } from "./utilityFunctions";
 let tvWidget: any = null;
 
 export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
-  const customDataUrl = getParameterByName("dataUrl");
-
-  if (customDataUrl !== "") {
-    datafeedUrl = customDataUrl.startsWith("https://")
-      ? customDataUrl
-      : `https://${customDataUrl}`;
-  }
 
   const widgetOptions: ChartingLibraryWidgetOptions = {
     //Widget configuration
@@ -28,9 +23,9 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
 
     // Chart Configuration
     symbol: assetSymbol as string,
-    interval: "2" as ResolutionString,
-    locale: <any>getParameterByName("lang") || ("en" as string),
-    // timezone: "Asia/Kolkata",
+    interval: "1D" as ResolutionString,
+    locale: <LanguageCode>getParameterByName("lang") || ("en" as string),
+    timezone: "Asia/Kolkata",
 
     // Data configuration
     datafeed: DataFeed as any,
@@ -48,13 +43,13 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
     autosize: true as boolean,
 
     // UI configuration
-    theme: <any>getParameterByName("theme") || ("dark" as string),
+    theme: <ThemeName>getParameterByName("theme") || ("dark" as string),
 
     // Chart features
-    disabled_features: [
+    disabled_features: <ChartingLibraryFeatureset[]> [
       "use_localstorage_for_settings",
     ] as ChartingLibraryFeatureset[],
-    enabled_features: ["study_templates"] as ChartingLibraryFeatureset[],
+    enabled_features: <ChartingLibraryFeatureset[]> ["study_templates"] as ChartingLibraryFeatureset[],
 
     // Saving and loading chart
     charts_storage_url: "https://saveloadctradingview.com" as string,

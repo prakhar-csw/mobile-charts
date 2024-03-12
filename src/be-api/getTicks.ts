@@ -23,6 +23,5 @@ export const getTicks = async (symbol: string, start: string, end: string, inter
 
     const responseData = await response.json();
     const ticksInfo = responseData.response;
-
     return ticksInfo;
  };

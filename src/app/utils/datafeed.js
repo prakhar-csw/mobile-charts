@@ -1,5 +1,5 @@
 import { SUPPORTED_RESOLUTIONS } from "./constants";
-import { areArraysEqualLength } from "./utilityFunctions";
+import { areArraysEqualLength, convertEpochToDateTime } from "./utilityFunctions";
 
 const checkDataLengthIsSame = (data) => {
   if (data && data?.o && data?.h && data?.l && data?.c && data?.v && data?.t) {
@@ -31,7 +31,7 @@ const constructDataForTradingViewApi = (ticksData) => {
 
     for (let i = 0; i < length; i++) {
       const newObj = {
-        time: parseInt(timeArr[i] / 1000),
+        time: parseInt(timeArr[i]),
         low: parseFloat(lowArr[i]),
         high: parseFloat(highArr[i]),
         open: parseFloat(openArr[i]),
@@ -44,12 +44,16 @@ const constructDataForTradingViewApi = (ticksData) => {
   return bars;
 };
 
+let config = null;
+
 export default {
-  onReady: async (callback) => {
+  onReady: async (onReadyCallBack) => {
     const response = await fetch("/api/config");
     const configurationData = await response.json();
 
-    setTimeout(() => callback(configurationData));
+    config = configurationData;
+
+    setTimeout(() => onReadyCallBack(configurationData));
   },
 
   searchSymbols: (userInput, exchange, symbolType, onResultReadyCallback) => {
@@ -76,8 +80,8 @@ export default {
       name: stockInformation.symbol,
       description: stockInformation.compName,
       type: stockInformation.instName,
-      session: "0930-1630",
-      timezone: "Etc/UTC",
+      session: "0915-1600",
+      timezone: "Asia/Kolkata",
       exchange: stockInformation.exch,
       minmov: 1,
       pricescale: 100,
@@ -87,11 +91,13 @@ export default {
       supported_resolutions: SUPPORTED_RESOLUTIONS,
       volume_precision: 2,
       data_status: "streaming",
+      price: 'format',
+      has_seconds: true,
     };
 
     setTimeout(() => {
-      onSymbolResolvedCallback(symbolInfo), 0;
-    });
+      onSymbolResolvedCallback(symbolInfo)
+    },0);
   },
 
   getBars: async (
@@ -106,9 +112,12 @@ export default {
     const { from, to, firstDataRequest } = periodParams;
     console.log(from, to, "period");
 
+    const fromInNormalDateTime = convertEpochToDateTime(from);
+    const toInNormalDateTime = convertEpochToDateTime(to);
+
     try {
       const response = await fetch(
-        `/api/history?symbol=${symbolInfo.ticker}&from=${from}&to=${to}&resolution=${resolution}`
+        `/api/history?symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=5s`
       );
 
       const ticksData = await response.json();
@@ -132,13 +141,25 @@ export default {
 
       let bars = constructDataForTradingViewApi(ticksData);
 
-      console.log("bars : ", bars);
+      if (bars.length) {
+        onHistoryCallback(bars.reverse(), { noData: false });
+      } else {
+        onHistoryCallback([], { noData: true });
+      }
 
-      onHistoryCallback(bars.reverse(), { noData: false });
     } catch (error) {
       console.log("[getBars]: Get error", error);
       onErrorCallback(error);
     }
+  },
+
+  getServerTime: async (callback) => {
+    if (!config.supports_time) {
+      return;
+    }
+    const response = await fetch("/api/time");
+    const timeResponse = await response.json();
+    callback(parseInt(timeResponse));
   },
 
   subscribeBars: (

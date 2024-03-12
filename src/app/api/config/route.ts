@@ -14,13 +14,13 @@ const getConfigData = () => {
     // exchanges:[],
     // supported_resolutions:[],
     supports_marks: false,
-    supports_time: false,
+    supports_time: true,
     supports_timescale_marks: false,
     // supports_timescale_marks: false,
     // symbols_grouping:{},
     // symbols_types:[]
     // unit:{},
-    supports_search: true,
+    supports_search: false,
     supports_group_request: false,
     supported_resolutions: SUPPORTED_RESOLUTIONS,
   };
