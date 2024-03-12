@@ -1,4 +1,4 @@
-import DataFeed from "../utils/datafeed.js";
+import DataFeed from "./datafeed";
 import {
   AvailableSaveloadVersions,
   ChartingLibraryFeatureset,
@@ -29,14 +29,6 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
 
     // Data configuration
     datafeed: DataFeed as any,
-    // datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(
-    //   datafeedUrl,
-    //   "10000",
-    //   {
-    //     maxResponseLength: 200,
-    //     expectedOrder: "latestFirst",
-    //   }
-    // ) as IBasicDataFeed,
 
     // Chart Size
     fullscreen: false as boolean,

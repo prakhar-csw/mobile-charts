@@ -18,37 +18,20 @@ export interface TicksInterface {
   serverTime: string;
 }
 
-export const getResponse = (ticksInfo: TicksInterface) => {
-  return {
-      t: ticksInfo?.data?.t,
-      o: ticksInfo?.data?.o,
-      h: ticksInfo?.data?.h,
-      l: ticksInfo?.data?.l,
-      c: ticksInfo?.data?.c,
-      v: ticksInfo?.data?.v,
-      s: "ok",
-  };
-};
-
 export async function GET(request: NextRequest) {
   const symbol = request.nextUrl.searchParams.get("symbol") || "";
   const from = request.nextUrl.searchParams.get("from") || "";
   const to = request.nextUrl.searchParams.get("to") || "";
   const resolution = request.nextUrl.searchParams.get("resolution") || "";
 
-  console.log(from, ' : from, ',to ,' : to, ', resolution,' : resolution, ', symbol,' : symbol\n');
-
 
   try {
-
     const ticketInfo: TicksInterface = await getTicks(
       symbol,
       from,
       to,
       resolution,
     );
-
-    // console.log('ticketInfo in history route ',ticketInfo);
 
     if (!symbol) {
       return NextResponse.json({

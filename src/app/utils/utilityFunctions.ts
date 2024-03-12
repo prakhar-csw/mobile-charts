@@ -25,10 +25,8 @@ export const areArraysEqualLength = (...arrays: any[][]): boolean => {
   return true; // All arrays have equal lengths
 }
 
-export const convertEpochToDateTime = (epochTime: string): string => {
-  const epochTimeInNumber = parseInt(epochTime);
-
-  const date = new Date(epochTimeInNumber); // Convert seconds to milliseconds
+export const convertEpochToDateTime = (epochTime: number): string => {
+  const date = new Date(epochTime);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
