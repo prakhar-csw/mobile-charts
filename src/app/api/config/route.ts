@@ -1,5 +1,6 @@
 import { SUPPORTED_RESOLUTIONS } from "@/app/utils/constants";
 import { NextRequest, NextResponse } from "next/server";
+import { CurrencyItem, DatafeedConfiguration, DatafeedSymbolType, Exchange, LibrarySymbolInfo, ResolutionString, Unit } from "../../../../public/charting_library/charting_library";
 
 
 /**
@@ -8,21 +9,17 @@ import { NextRequest, NextResponse } from "next/server";
  */
 
 
-const getConfigData = () => {
+const getConfigData = (): DatafeedConfiguration => {
   return {
-    // currency_codes: ["INR"],
-    // exchanges:[],
-    // supported_resolutions:[],
-    supports_marks: false,
-    supports_time: true,
-    supports_timescale_marks: false,
-    // supports_timescale_marks: false,
+    currency_codes: ["INR"] as string[],
+    // exchanges: [] as Exchange[], 
+    supported_resolutions: SUPPORTED_RESOLUTIONS as ResolutionString[],
+    supports_marks: false as boolean,
+    supports_time: true as boolean,
+    supports_timescale_marks: false as boolean,
     // symbols_grouping:{},
-    // symbols_types:[]
-    // unit:{},
-    supports_search: false,
-    supports_group_request: false,
-    supported_resolutions: SUPPORTED_RESOLUTIONS,
+    // symbols_types:[] as DatafeedSymbolType[],
+    // units:{} as Record<string, Unit[]>,
   };
 };
 

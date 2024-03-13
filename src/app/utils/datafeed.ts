@@ -1,5 +1,6 @@
 import {
-    Bar,
+  Bar,
+  DatafeedConfiguration,
   HistoryCallback,
   HistoryMetadata,
   LibrarySymbolInfo,
@@ -15,7 +16,7 @@ import {
   VisiblePlotsSet,
 } from "../../../public/charting_library/charting_library";
 import { PeriodParamsWithOptionalCountback } from "../../../public/datafeeds/udf/src/history-provider";
-import { SUPPORTED_RESOLUTIONS } from "./constants";
+import { SUPPORTED_RESOLUTIONS, getApiEP } from "./constants";
 import {
   areArraysEqualLength,
   convertEpochToDateTime,
@@ -30,7 +31,7 @@ interface OHLCVT {
     t: number[],
 };
 
-const checkDataLengthIsSame = (data: OHLCVT ) => {
+const checkDataLengthIsSame = (data: OHLCVT ): boolean => {
   if (data && data?.o && data?.h && data?.l && data?.c && data?.v && data?.t) {
     return areArraysEqualLength(
       data?.o,
@@ -73,11 +74,13 @@ const constructDataForTradingViewApi = (ticksData : OHLCVT) : Bar[] => {
   return bars;
 };
 
-let config: { supports_time: any; } | null = null;
+let config: DatafeedConfiguration;
 
 export default {
   onReady: async (onReadyCallBack: OnReadyCallback) => {
-    const response = await fetch("/api/config");
+    const endPoint = getApiEP('config');
+
+    const response = await fetch(endPoint);
     const configurationData = await response.json();
 
     config = configurationData;
@@ -100,7 +103,10 @@ export default {
     onResolveErrorCallback: ErrorCallback,
     extension?: SymbolResolveExtension
   ) => {
-    const response = await fetch(`/api/symbols?symbol=${symbolName}`);
+    
+    const endPoint = getApiEP('symbols', `symbol=${symbolName}`);
+
+    const response = await fetch(endPoint);
     const stockInformation = await response.json();
 
     if (!stockInformation) {
@@ -150,9 +156,9 @@ export default {
     const toInNormalDateTime = convertEpochToDateTime(to);
 
     try {
-      const response = await fetch(
-        `/api/history?symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=5s`
-      );
+
+      const endPoint = getApiEP('history', `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=5s`);
+      const response = await fetch(endPoint);
 
       const ticksData = await response.json();
 
@@ -188,10 +194,12 @@ export default {
   },
 
   getServerTime: async (callback: ServerTimeCallback) => {
-    if (!config?.supports_time) {
+    if (!config || !config?.supports_time) {
       return;
     }
-    const response = await fetch("/api/time");
+    const endPoint = getApiEP('time');
+
+    const response = await fetch(endPoint);
     const timeResponse = await response.json();
     callback(parseInt(timeResponse));
   },

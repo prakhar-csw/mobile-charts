@@ -4,8 +4,6 @@ import { initOnReady, removeWhenExit } from "../../../src/app/utils";
 export interface ChartModule {
     dataFeedUrl: string,
     assetSymbol: string,
-
-
     element: React.ReactElement;
     init(dataFeedUrl: string): void;
     dataFeed(): void;
