@@ -14,13 +14,13 @@ import {
   SymbolResolveExtension,
   Timezone,
   VisiblePlotsSet,
-} from "../../../public/charting_library/charting_library";
-import { PeriodParamsWithOptionalCountback } from "../../../public/datafeeds/udf/src/history-provider";
-import { SUPPORTED_RESOLUTIONS, getApiEP } from "./constants";
+} from "../../../../public/charting_library/charting_library";
+import { PeriodParamsWithOptionalCountback } from "../../../../public/datafeeds/udf/src/history-provider";
+import { SUPPORTED_RESOLUTIONS, getApiEP } from "../constants";
 import {
   areArraysEqualLength,
   convertEpochToDateTime,
-} from "./utilityFunctions";
+} from "../utilityFunctions";
 
 interface OHLCVT {
     o: number[],

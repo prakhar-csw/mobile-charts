@@ -8,9 +8,9 @@ import {
   ResolutionString,
   ThemeName,
   widget,
-} from "../../../public/charting_library";
+} from "../../../../public/charting_library";
 
-import { getParameterByName } from "./utilityFunctions";
+import { getParameterByName } from "../utilityFunctions";
 
 let tvWidget: any = null;
 
