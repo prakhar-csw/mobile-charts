@@ -16,10 +16,12 @@ import {
   VisiblePlotsSet,
 } from "../../../../public/charting_library/charting_library";
 import { PeriodParamsWithOptionalCountback } from "../../../../public/datafeeds/udf/src/history-provider";
-import { SUPPORTED_RESOLUTIONS, getApiEP } from "../constants";
+import { subscribeOnStream, unsubscribeFromStream } from "./streaming";
+import { SUPPORTED_RESOLUTIONS } from "../constants";
 import {
   areArraysEqualLength,
   convertEpochToDateTime,
+  getApiEP,
 } from "../utilityFunctions";
 
 interface OHLCVT {
@@ -75,6 +77,8 @@ const constructDataForTradingViewApi = (ticksData : OHLCVT) : Bar[] => {
 };
 
 let config: DatafeedConfiguration;
+
+const lastBarsCache = new Map();
 
 export default {
   onReady: async (onReadyCallBack: OnReadyCallback) => {
@@ -150,13 +154,15 @@ export default {
     onErrorCallback: ErrorCallback,
   ) => {
     const { from, to, firstDataRequest } = periodParams;
-    console.log(from, to, "period");
 
     const fromInNormalDateTime = convertEpochToDateTime(from);
     const toInNormalDateTime = convertEpochToDateTime(to);
 
-    try {
+    const TEST_FROM = '2024-03-02T10:46:11';
+    const TEST_TO = '2024-03-13T10:47:15'; 
 
+    try {
+      // const endPoint = getApiEP('history', `symbol=${symbolInfo.ticker}&from=${TEST_FROM}&to=${TEST_TO}&resolution=5s`);
       const endPoint = getApiEP('history', `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=5s`);
       const response = await fetch(endPoint);
 
@@ -178,8 +184,11 @@ export default {
       }
 
       let bars = <Bar[]> constructDataForTradingViewApi(ticksData.data);
-
       bars.reverse();
+
+      if (symbolInfo && bars.length && firstDataRequest) {
+        lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, { ...bars[bars.length - 1] });
+      }
 
       if (bars.length) {
         onHistoryCallback(bars, {noData: false} as HistoryMetadata);
@@ -205,14 +214,14 @@ export default {
   },
 
   subscribeBars: (
-    symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, //onTick: SubscribeBarsCallback, listenerGuid: string, _onResetCacheNeededCallback: () => void
+    symbolInfo: LibrarySymbolInfo, resolution: ResolutionString,
     onRealtimeCallback: SubscribeBarsCallback,
     subscriberUID: string,
     onResetCacheNeededCallback: () => void,
   ) => {
     console.log(
       "[subscribeBars]: Method call with subscriberUID:",
-      subscriberUID
+      subscriberUID, 'symbolInfo : ',symbolInfo, 'resolution : ',resolution
     );
     // subscribeOnStream(
     //     symbolInfo,

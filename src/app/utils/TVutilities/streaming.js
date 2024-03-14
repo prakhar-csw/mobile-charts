@@ -1,3 +1,5 @@
+import { io } from 'socket.io-client';
+
 // Returns all parts of the symbol
 export function parseFullSymbol(fullSymbol) {
   const match = fullSymbol.match(/^(\w+):(\w+)\/(\w+)$/);
@@ -7,7 +9,27 @@ export function parseFullSymbol(fullSymbol) {
   return { exchange: match[1], fromSymbol: match[2], toSymbol: match[3] };
 }
 
-const socket = io("wss://streamer.cryptocompare.com");
+/* Sample object
+{ 
+  symbol: '43911_NFO',
+  ltp: '13.08',
+  chngPer: '1.00',
+  chng: '10.22',
+  close: '10.65',
+  timestamp: 1700432320,
+  ltt: 1700432320
+}
+ */
+
+
+//Takes value in epoch.
+function getNextDailyBarTime(barTime) {
+  const date = new Date(barTime * 1000);
+  date.setDate(date.getDate() + 1);
+  return date.getTime() / 1000;
+}
+
+const socket = io('ws://localhost:3001', { transports : ['websocket'] });
 
 const channelToSubscription = new Map();
 
@@ -23,7 +45,7 @@ socket.on("error", (error) => {
   console.log("[socket] Error:", error);
 });
 
-socket.on("m", (data) => {
+socket.on("message_from_redis", (data) => {
   console.log("[socket] Message:", data);
   const [
     eventTypeStr,
@@ -76,12 +98,6 @@ socket.on("m", (data) => {
   subscriptionItem.handlers.forEach((handler) => handler.callback(bar));
 });
 
-function getNextDailyBarTime(barTime) {
-  const date = new Date(barTime * 1000);
-  date.setDate(date.getDate() + 1);
-  return date.getTime() / 1000;
-}
-
 export function subscribeOnStream(
   symbolInfo,
   resolution,
@@ -93,11 +109,17 @@ export function subscribeOnStream(
   const parsedSymbol = parseFullSymbol(
     `${symbolInfo.exchange}:${symbolInfo.name}`
   );
+
+  // Parse the symbol you are getting to get the exchange, from symbol and get symbol.
   const channelString = `0~${parsedSymbol.exchange}~${parsedSymbol.fromSymbol}~${parsedSymbol.toSymbol}`;
+
+  // Construct a handler object.
   const handler = {
     id: subscriberUID,
     callback: onRealtimeCallback,
   };
+
+
   let subscriptionItem = channelToSubscription.get(channelString);
   if (subscriptionItem) {
     // Already subscribed to the channel, use the existing subscription

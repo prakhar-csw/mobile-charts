@@ -1,28 +1,35 @@
-'use client';
-import { useEffect } from 'react';
-import io from 'socket.io-client';
+"use client";
+import { useEffect, useRef, useState } from "react";
+import io, { Socket } from "socket.io-client";
 
 const Home = () => {
-  useEffect(() => {
-    const socket = io('http://localhost:4000'); // replace with your server URL
+  const [stockData, setStockData] = useState(null);
 
-    // Example: Handling a message from the server
-    socket.on('message', (message: string) => {
-      console.log(`Received message from server: ${message}`);
+  const socketRef = useRef<Socket>();
+
+  useEffect(() => { 
+    const socket = io('ws://localhost:3001', { transports : ['websocket'] });
+    socketRef.current = socket;
+    socket.on('message_from_redis', (data) => {
+      console.log('data : ',data);
+      setStockData(data);
     });
-
-    // Example: Emitting a message to the server
-    socket.emit('clientMessage', 'Hello from the client');
-
-    // Clean up the socket connection when the component unmounts
     return () => {
       socket.disconnect();
     };
   }, []);
 
+  const sendMessageToServer = () =>{ 
+    socketRef.current?.emit('message', 'A Random message')
+  }
+
   return (
     <div>
-      {/* Your Next.js component content */}
+      <h1>Real-Time Stock Updates</h1>
+      <button onClick={sendMessageToServer}>
+        Click me
+      </button>
+      {stockData && <p>{stockData}</p>}
     </div>
   );
 };

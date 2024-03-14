@@ -37,3 +37,16 @@ export const convertEpochToDateTime = (epochTime: number): string => {
   const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   return formattedDateTime;
 };
+
+export const transformResolutionAsPerBE = (resolution : string): string =>{
+  let modifiedResolution = '';
+
+  return modifiedResolution;
+};
+
+export const getApiEP = (key: string, params?: string) : string =>{
+  let EP = `/api/${key}`;
+  if(params)
+      EP = EP + '?' + params;
+  return EP;
+};
