@@ -39,9 +39,9 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
 
     // Chart features
     disabled_features: <ChartingLibraryFeatureset[]> [
-      "use_localstorage_for_settings",
+      "use_localstorage_for_settings","header_symbol_search",
     ] as ChartingLibraryFeatureset[],
-    enabled_features: <ChartingLibraryFeatureset[]> ["study_templates"] as ChartingLibraryFeatureset[],
+    enabled_features: <ChartingLibraryFeatureset[]> ["study_templates", "seconds_resolution"],
 
     // Saving and loading chart
     charts_storage_url: "https://saveloadctradingview.com" as string,
