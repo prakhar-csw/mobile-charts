@@ -1,3 +1,5 @@
+import { resolutionMapping } from "./constants";
+
 export const getParameterByName = (name: string): string => {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
   const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
@@ -40,6 +42,17 @@ export const convertEpochToDateTime = (epochTime: number): string => {
 
 export const transformResolutionAsPerBE = (resolution : string): string =>{
   let modifiedResolution = '';
+  const numericalValue = resolution.slice(0,-1) as string;
+  const unit = resolution.slice(-1) as string; 
+  let newUnit = '';
+
+  if(unit in resolutionMapping){
+    newUnit = resolutionMapping[unit];
+    modifiedResolution = numericalValue + newUnit;
+  } else {
+    newUnit = 'm';
+    modifiedResolution = resolution + newUnit;
+  }
 
   return modifiedResolution;
 };

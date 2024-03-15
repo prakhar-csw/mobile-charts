@@ -22,6 +22,7 @@ import {
   areArraysEqualLength,
   convertEpochToDateTime,
   getApiEP,
+  transformResolutionAsPerBE,
 } from "../utilityFunctions";
 
 interface OHLCVT {
@@ -121,7 +122,7 @@ export default {
 
     // Symbol information object
     const symbolInfo : LibrarySymbolInfo = {
-      ticker: stockInformation.streamSym as string,
+      ticker: stockInformation.symbolToken as string,
       name: stockInformation.symbol as string,
       description: stockInformation.compName as string,
       type: stockInformation.instName as string,
@@ -161,9 +162,10 @@ export default {
     const TEST_FROM = '2024-03-02T10:46:11';
     const TEST_TO = '2024-03-13T10:47:15'; 
 
+    const transfromedResolution = transformResolutionAsPerBE(resolution);
+
     try {
-      // const endPoint = getApiEP('history', `symbol=${symbolInfo.ticker}&from=${TEST_FROM}&to=${TEST_TO}&resolution=5s`);
-      const endPoint = getApiEP('history', `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=5s`);
+      const endPoint = getApiEP('history', `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=${transfromedResolution}`);
       const response = await fetch(endPoint);
 
       const ticksData = await response.json();
