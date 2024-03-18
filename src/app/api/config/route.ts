@@ -1,4 +1,4 @@
-import { SUPPORTED_RESOLUTIONS } from "@/app/utils/constants";
+import { CURRENCY_CODE, EXCHANGE, SUPPORTED_RESOLUTIONS } from "@/app/utils/constants";
 import { NextRequest, NextResponse } from "next/server";
 import { CurrencyItem, DatafeedConfiguration, DatafeedSymbolType, Exchange, LibrarySymbolInfo, ResolutionString, Unit } from "../../../../public/charting_library/charting_library";
 
@@ -11,8 +11,8 @@ import { CurrencyItem, DatafeedConfiguration, DatafeedSymbolType, Exchange, Libr
 
 const getConfigData = (): DatafeedConfiguration => {
   return {
-    currency_codes: ["INR"] as string[],
-    // exchanges: [] as Exchange[], 
+    currency_codes: [CURRENCY_CODE] as string[],
+    exchanges: [EXCHANGE.NSE] as unknown as Exchange[], 
     supported_resolutions: SUPPORTED_RESOLUTIONS as ResolutionString[],
     supports_marks: false as boolean,
     supports_time: true as boolean,

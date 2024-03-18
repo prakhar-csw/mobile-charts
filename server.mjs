@@ -8,18 +8,27 @@ const server = http.createServer();
 // Create a Socket.IO server instance
 const io = new Server(server);
 
+let channelName = "";
+
 // Define socket.io event handlers
 io.on("connection", (socket) => {
+
   console.log("A user connected");
 
-  const redis = new Redis(6379);
+  socket.on("set_stock_channel_name", (channel) => {
+    channelName = channel;
+    console.log("connected to channel : ", channelName);
+  });
 
-  redis.subscribe("stock_channel", (err, count) => {
+  const redis = new Redis(6379);
+  console.log('channel Nam : ',channelName);
+
+  redis.subscribe('stock_channel', (err, count) => {
     if (err) {
       console.error("Failed to subscribe: %s", err.message);
     } else {
       console.log(
-        `Subscribed successfully! This client is currently subscribed to ${count} channel.`
+        `Subscribed successfully! This client is currently subscribed to ${count} channel ${channelName}.`
       );
     }
   });
@@ -27,15 +36,18 @@ io.on("connection", (socket) => {
   // Recieve MESSAGE from Redis server.
   redis.on("message", (channel, message) => {
     console.log(`Received ${message} from ${channel}`);
-    socket.emit('message_from_redis', message);
+
+    // Send message to socket-client.
+    socket.emit("message_from_redis", message);
   });
 
   // Handle disconnection
   socket.on("disconnect", () => {
     console.log("User disconnected");
+    redis.unsubscribe(channelName).then((msg)=>{
+      console.log(`redis disconnected ${msg}`);
+    });
   });
-
-  socket.on('message', message=>console.log('message : ',message));
 });
 
 // Start the server

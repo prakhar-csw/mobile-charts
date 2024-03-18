@@ -1,4 +1,4 @@
-import { resolutionMapping } from "./constants";
+import { EXCHANGE, RESOLUTION_MAPPING } from "./constants";
 
 export const getParameterByName = (name: string): string => {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -9,11 +9,10 @@ export const getParameterByName = (name: string): string => {
     : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
-
 export const areArraysEqualLength = (...arrays: any[][]): boolean => {
   if (arrays.length < 2) {
     // At least two arrays are required for comparison
-    throw new Error('At least two arrays are required for comparison.');
+    throw new Error("At least two arrays are required for comparison.");
   }
 
   const firstArrayLength = arrays[0].length;
@@ -25,10 +24,10 @@ export const areArraysEqualLength = (...arrays: any[][]): boolean => {
   }
 
   return true; // All arrays have equal lengths
-}
+};
 
 export const convertEpochToDateTime = (epochTime: number): string => {
-  const date = new Date(epochTime);
+  const date = new Date(epochTime * 1000); // converting it in millisecond
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -40,26 +39,31 @@ export const convertEpochToDateTime = (epochTime: number): string => {
   return formattedDateTime;
 };
 
-export const transformResolutionAsPerBE = (resolution : string): string =>{
-  let modifiedResolution = '';
-  const numericalValue = resolution.slice(0,-1) as string;
-  const unit = resolution.slice(-1) as string; 
-  let newUnit = '';
+export const transformResolutionAsPerBE = (resolution: string): string => {
+  let modifiedResolution = "";
+  const numericalValue = resolution.slice(0, -1) as string;
+  const unit = resolution.slice(-1) as string;
+  let newUnit = "";
 
-  if(unit in resolutionMapping){
-    newUnit = resolutionMapping[unit];
+  if (unit in RESOLUTION_MAPPING) {
+    newUnit = RESOLUTION_MAPPING[unit];
     modifiedResolution = numericalValue + newUnit;
   } else {
-    newUnit = 'm';
+    newUnit = "m";
     modifiedResolution = resolution + newUnit;
   }
 
   return modifiedResolution;
 };
 
-export const getApiEP = (key: string, params?: string) : string =>{
+export const getApiEP = (key: string, params?: string): string => {
   let EP = `/api/${key}`;
-  if(params)
-      EP = EP + '?' + params;
+  if (params) EP = EP + "?" + params;
   return EP;
+};
+
+export const getChannelString = (ticker: string): string => {
+  const stockCode = ticker.split("_")[0];
+  const channelString = stockCode + '_' + EXCHANGE.NSE;
+  return channelString;
 };

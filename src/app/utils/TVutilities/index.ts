@@ -3,14 +3,16 @@ import {
   AvailableSaveloadVersions,
   ChartingLibraryFeatureset,
   ChartingLibraryWidgetOptions,
-  IBasicDataFeed,
   LanguageCode,
   ResolutionString,
   ThemeName,
+  TimeFrameItem,
+  Timezone,
   widget,
 } from "../../../../public/charting_library";
 
 import { getParameterByName } from "../utilityFunctions";
+import { CUSTOMIZED_TIME_FRAMES, DEFAULT_RESOLUTION, TIMEZONE } from "../constants";
 
 let tvWidget: any = null;
 
@@ -23,9 +25,10 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
 
     // Chart Configuration
     symbol: assetSymbol as string,
-    interval: "1D" as ResolutionString,
+    interval: DEFAULT_RESOLUTION as ResolutionString,
     locale: <LanguageCode>getParameterByName("lang") || ("en" as string),
-    timezone: "Asia/Kolkata",
+    timezone: TIMEZONE as Timezone,
+    time_frames: CUSTOMIZED_TIME_FRAMES as TimeFrameItem[],
 
     // Data configuration
     datafeed: DataFeed as any,
@@ -51,7 +54,7 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
     // debug:true
   };
 
-  tvWidget = new widget(widgetOptions);
+  tvWidget = new widget(widgetOptions as any);
 
   tvWidget.onChartReady(function () {});
   window.frames[0].focus();

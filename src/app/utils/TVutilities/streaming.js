@@ -1,4 +1,6 @@
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
+
+import { getChannelString } from "../utilityFunctions";
 
 // Returns all parts of the symbol
 export function parseFullSymbol(fullSymbol) {
@@ -10,31 +12,42 @@ export function parseFullSymbol(fullSymbol) {
 }
 
 /* Sample object
-{ 
-  symbol: '43911_NFO',
-  ltp: '13.08',
-  chngPer: '1.00',
-  chng: '10.22',
-  close: '10.65',
-  timestamp: 1700432320,
-  ltt: 1700432320
-}
+  { 
+    symbol: '3456_NSE',
+    ltp: '945.10',
+    chngPer: '-2.34',
+    chng: '-22.65',
+    close: '967.75',
+    timestamp: 1710512476,
+    ltt: 1710512476
+  }
  */
 
-
 //Takes value in epoch.
-function getNextDailyBarTime(barTime) {
-  const date = new Date(barTime * 1000);
-  date.setDate(date.getDate() + 1);
-  return date.getTime() / 1000;
+function getNextDailyBarTime(epochTime) {
+  // const date = new Date(barTime);
+  // date.setDate(date.getDate() + 1);
+  // return date.getTime();
+  if (String(epochTime).length === 13) {
+    epochTime = Math.floor(epochTime / 1000);
+  }
+
+  // Add 60 seconds to the given epoch time
+  let nextMinuteEpoch = epochTime + 60;
+
+  // // Optionally, convert the result back to milliseconds
+  nextMinuteEpoch *= 1000; // Uncomment this line if you need the result in milliseconds
+
+  return nextMinuteEpoch;
 }
 
-const socket = io('ws://localhost:3001', { transports : ['websocket'] });
+const socket = io("ws://localhost:3001", { transports: ["websocket"] });
 
 const channelToSubscription = new Map();
 
 socket.on("connect", () => {
   console.log("[socket] Connected");
+  // socket.emit('set_stock_channel_name', 'stock_channel');
 });
 
 socket.on("disconnect", (reason) => {
@@ -46,56 +59,52 @@ socket.on("error", (error) => {
 });
 
 socket.on("message_from_redis", (data) => {
-  console.log("[socket] Message:", data);
-  const [
-    eventTypeStr,
-    exchange,
-    fromSymbol,
-    toSymbol,
-    ,
-    ,
-    tradeTimeStr,
-    ,
-    tradePriceStr,
-  ] = data.split("~");
+  const dataInJSON = JSON.parse(data);
 
-  if (parseInt(eventTypeStr) !== 0) {
-    // Skip all non-trading events
-    return;
-  }
-  const tradePrice = parseFloat(tradePriceStr);
-  const tradeTime = parseInt(tradeTimeStr);
-  const channelString = `0~${exchange}~${fromSymbol}~${toSymbol}`;
+  const { symbol, ltp, chngPer, chng, close, timestamp, ltt } = dataInJSON;
+
+  const tradePrice = parseFloat(ltp);
+  const tradeTime = parseInt(ltt);
+
+  const channelString = getChannelString(symbol);
+
   const subscriptionItem = channelToSubscription.get(channelString);
+
   if (subscriptionItem === undefined) {
     return;
   }
+
   const lastDailyBar = subscriptionItem.lastDailyBar;
   const nextDailyBarTime = getNextDailyBarTime(lastDailyBar.time);
 
   let bar;
-  if (tradeTime >= nextDailyBarTime) {
-    bar = {
-      time: nextDailyBarTime,
-      open: tradePrice,
-      high: tradePrice,
-      low: tradePrice,
-      close: tradePrice,
-    };
-    console.log("[socket] Generate new bar", bar);
-  } else {
-    bar = {
-      ...lastDailyBar,
-      high: Math.max(lastDailyBar.high, tradePrice),
-      low: Math.min(lastDailyBar.low, tradePrice),
-      close: tradePrice,
-    };
-    console.log("[socket] Update the latest bar by price", tradePrice);
+  try {
+    // If the candleStick is of next day.
+    if (tradeTime >= nextDailyBarTime) {
+      bar = {
+        time: nextDailyBarTime,
+        open: tradePrice,
+        high: tradePrice,
+        low: tradePrice,
+        close: close,
+      };
+    } else {
+      bar = {
+        ...lastDailyBar,
+        high: Math.max(lastDailyBar.high, tradePrice),
+        low: Math.min(lastDailyBar.low, tradePrice),
+        close: close,
+      };
+    }
+  } catch (err) {
+    console.error("err :", err);
   }
   subscriptionItem.lastDailyBar = bar;
 
   // Send data to every subscriber of that symbol
-  subscriptionItem.handlers.forEach((handler) => handler.callback(bar));
+  subscriptionItem.handlers.forEach((handler) => {
+    handler.subscribeBarCallBack(bar);
+  });
 });
 
 export function subscribeOnStream(
@@ -106,37 +115,36 @@ export function subscribeOnStream(
   onResetCacheNeededCallback,
   lastDailyBar
 ) {
-  const parsedSymbol = parseFullSymbol(
-    `${symbolInfo.exchange}:${symbolInfo.name}`
-  );
+  // console.log("subscriberUid recieved : ", subscriberUID); // 3456_1_#_INR_#_1D
 
-  // Parse the symbol you are getting to get the exchange, from symbol and get symbol.
-  const channelString = `0~${parsedSymbol.exchange}~${parsedSymbol.fromSymbol}~${parsedSymbol.toSymbol}`;
-
+  const channelString = getChannelString(subscriberUID);
   // Construct a handler object.
   const handler = {
     id: subscriberUID,
-    callback: onRealtimeCallback,
+    subscribeBarCallBack: onRealtimeCallback,
   };
 
-
   let subscriptionItem = channelToSubscription.get(channelString);
+
   if (subscriptionItem) {
     // Already subscribed to the channel, use the existing subscription
     subscriptionItem.handlers.push(handler);
     return;
   }
+
   subscriptionItem = {
     subscriberUID,
     resolution,
     lastDailyBar,
     handlers: [handler],
   };
+
   channelToSubscription.set(channelString, subscriptionItem);
-  console.log(
-    "[subscribeBars]: Subscribe to streaming. Channel:",
-    channelString
-  );
+  // console.log(
+  //   "[subscribeBars]: Subscribe to streaming. Channel:",
+  //   channelString,
+  //   subscriptionItem
+  // );
   socket.emit("SubAdd", { subs: [channelString] });
 }
 
