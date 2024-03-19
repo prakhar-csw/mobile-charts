@@ -12,7 +12,7 @@ import {
 } from "../../../../public/charting_library";
 
 import { getParameterByName } from "../utilityFunctions";
-import { CUSTOMIZED_TIME_FRAMES, DEFAULT_RESOLUTION, TIMEZONE } from "../constants";
+import { CUSTOMIZED_TIME_FRAMES, DEFAULT_RESOLUTION, DEFAULT_TIME_FRAME, TIMEZONE } from "../constants";
 
 let tvWidget: any = null;
 
@@ -28,6 +28,7 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
     interval: DEFAULT_RESOLUTION as ResolutionString,
     locale: <LanguageCode>getParameterByName("lang") || ("en" as string),
     timezone: TIMEZONE as Timezone,
+    timeframe: DEFAULT_TIME_FRAME as string,
     time_frames: CUSTOMIZED_TIME_FRAMES as TimeFrameItem[],
 
     // Data configuration

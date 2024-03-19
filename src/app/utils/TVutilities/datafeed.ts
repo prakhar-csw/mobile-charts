@@ -55,6 +55,22 @@ const checkDataLengthIsSame = (data: OHLCVT): boolean => {
   }
 };
 
+/**
+ * Check if the epochTime is greater than the current Date-time.
+ * @param epochTime 
+ * @returns epochtime
+ */
+
+const getToParameterForApiCall = (epochTime : number) : number  => { 
+    const toParamByTv = epochTime * 1000;
+    const currentDate = new Date().getTime();
+
+    if(toParamByTv >= currentDate)
+      return currentDate / 1000;
+    else return epochTime;
+
+}
+
 const constructDataForTradingViewApi = (
   ticksData: OHLCVT,
   from: number,
@@ -123,7 +139,7 @@ export default {
     symbolType: string,
     onResult: SearchSymbolsCallback
   ) => {
-    console.log("[searchSymbols]: Method call");
+    console.log("[searchSymbols]: Method call", userInput);
   },
 
   resolveSymbol: async (
@@ -169,7 +185,6 @@ export default {
       visible_plots_set: "ohlcv" as VisiblePlotsSet,
       supported_resolutions: SUPPORTED_RESOLUTIONS as ResolutionString[],
       volume_precision: 2 as number,
-      data_status: "streaming",
       format: "1/10/.../10000000" as SeriesFormat,
     };
 
@@ -187,10 +202,11 @@ export default {
   ) => {
     // Giving data in seconds
     const { from, to, firstDataRequest } = periodParams;
+    let bars = <Bar[]>[];
 
     const fromInNormalDateTime = convertEpochToDateTime(from);
-    const toInNormalDateTime = convertEpochToDateTime(to);
-
+    // As per trading-view  range getBars recieve : [from, to)
+    const toInNormalDateTime = convertEpochToDateTime(getToParameterForApiCall(to));
     const transfromedResolution = transformResolutionAsPerBE(resolution);
 
     const TEST_FROM = "2019-10-15T05:30:00";
@@ -218,11 +234,10 @@ export default {
         onHistoryCallback([], { noData: true } as HistoryMetadata);
       }
 
-      let bars = <Bar[]>(
-        constructDataForTradingViewApi(ticksData.data, from, to)
-      );
-      bars.reverse();
-
+      bars = [...bars, ...constructDataForTradingViewApi(ticksData.data, from, to)];
+        
+      bars.reverse(); //culprit
+ 
       if (symbolInfo && bars.length && firstDataRequest) {
         lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, {
           ...bars[bars.length - 1],

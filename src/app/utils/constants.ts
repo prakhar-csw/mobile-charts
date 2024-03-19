@@ -8,9 +8,11 @@ export const CURRENCY_CODE = "INR";
 
 export const SESSION_TIME = "0915-1530";
 
-export const SUPPORTED_RESOLUTIONS = ["5S", "15S", "1", "D"];
+export const SUPPORTED_RESOLUTIONS = ["5S", "15S", "1", "1D"];
 
-export const DEFAULT_RESOLUTION = "1D";
+export const DEFAULT_RESOLUTION = "1";
+
+export const DEFAULT_TIME_FRAME = '1D';
 
 // export const SUPPORTED_RESOLUTIONS = ['5S','15S','30S','1','2','3','4','5','10','15','20','25','30','45','60','75','120','125','180','240','1D','1W'];
 
@@ -39,3 +41,5 @@ export const EXCHANGE: { [key: string]: string } = {
   NSE: "NSE",
   BSE: "BSE",
 };
+
+export const SOCKET_PORT:number = 4000;
