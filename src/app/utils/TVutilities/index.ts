@@ -43,7 +43,7 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
 
     // Chart features
     disabled_features: <ChartingLibraryFeatureset[]> [
-      "use_localstorage_for_settings","header_symbol_search",
+      "use_localstorage_for_settings",
     ] as ChartingLibraryFeatureset[],
     enabled_features: <ChartingLibraryFeatureset[]> ["study_templates", "seconds_resolution"],
 

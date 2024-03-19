@@ -27,11 +27,12 @@ import {
 import {
   areArraysEqualLength,
   convertEpochToDateTime,
+  debounce,
   getApiEP,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
 
-interface OHLCVT {
+interface IOHLCVT {
   o: number[];
   h: number[];
   l: number[];
@@ -40,7 +41,42 @@ interface OHLCVT {
   t: number[];
 }
 
-const checkDataLengthIsSame = (data: OHLCVT): boolean => {
+interface IStockInformation {
+  symbol: string;
+  dispPriceTick: string;
+  lotSize: string;
+  multiplier: number;
+  streamSym: string;
+  nIssueRate: number;
+  assetClass: string;
+  sectorName: string;
+  compName: string;
+  token: string;
+  divisor: string;
+  mktSegId: string;
+  coCode: string;
+  marketCapType: string;
+  series: string;
+  exch: string;
+  expiry: string;
+  id: string;
+  instName: string;
+  surveillanceMsg: string;
+  symbolToken: string;
+  strikePrice: string;
+  isin: string;
+  option: string;
+}
+
+interface ISymbolSearchOption {
+  description: string;
+  exchange: string;
+  full_name: string;
+  symbol: string;
+  type: string;
+}
+
+const checkDataLengthIsSame = (data: IOHLCVT): boolean => {
   if (data && data?.o && data?.h && data?.l && data?.c && data?.v && data?.t) {
     return areArraysEqualLength(
       data?.o,
@@ -57,22 +93,20 @@ const checkDataLengthIsSame = (data: OHLCVT): boolean => {
 
 /**
  * Check if the epochTime is greater than the current Date-time.
- * @param epochTime 
+ * @param epochTime
  * @returns epochtime
  */
 
-const getToParameterForApiCall = (epochTime : number) : number  => { 
-    const toParamByTv = epochTime * 1000;
-    const currentDate = new Date().getTime();
+const getToParameterForApiCall = (epochTime: number): number => {
+  const toParamByTv = epochTime * 1000;
+  const currentDate = new Date().getTime();
 
-    if(toParamByTv >= currentDate)
-      return currentDate / 1000;
-    else return epochTime;
-
-}
+  if (toParamByTv >= currentDate) return currentDate / 1000;
+  else return epochTime;
+};
 
 const constructDataForTradingViewApi = (
-  ticksData: OHLCVT,
+  ticksData: IOHLCVT,
   from: number,
   to: number
 ): Bar[] => {
@@ -105,6 +139,72 @@ const constructDataForTradingViewApi = (
   return bars;
 };
 
+const constructSymbolObjectForTradingView = (
+  stockInformation: IStockInformation
+): LibrarySymbolInfo => {
+  const symbolInfo: LibrarySymbolInfo = {
+    ticker: stockInformation.symbolToken as string,
+    name: stockInformation.symbol as string,
+    description: stockInformation.compName as string,
+    type: stockInformation.instName as string,
+    session: SESSION_TIME as string,
+    session_holidays: SESSION_HOLIDAYS as string,
+    timezone: TIMEZONE as Timezone,
+    exchange: stockInformation.exch as string,
+    listed_exchange: stockInformation.exch as string,
+
+    currency_code: CURRENCY_CODE as string,
+    minmov: 1 as number,
+    pricescale: 100 as number,
+
+    has_seconds: true as boolean,
+    has_intraday: true as boolean,
+    has_daily: true as boolean,
+    has_weekly_and_monthly: true as boolean,
+
+    visible_plots_set: "ohlcv" as VisiblePlotsSet,
+    supported_resolutions: SUPPORTED_RESOLUTIONS as ResolutionString[],
+    volume_precision: 2 as number,
+    format: "1/10/.../10000000" as SeriesFormat,
+  };
+
+  return symbolInfo;
+};
+
+const constructSymbolSearchOptionForTradingView = (
+  symbolSearchArrFromBE: any
+): ISymbolSearchOption[] => {
+  let symbolSearchOptionArray: ISymbolSearchOption[] = [];
+
+  if (symbolSearchArrFromBE) {
+    for (let i = 0; i < symbolSearchArrFromBE.length; i++) {
+      const oldObj = symbolSearchArrFromBE[i];
+      const newObj = {
+        description: oldObj.Seo_symbol_s,
+        exchange: oldObj._Exch_s,
+        full_name: oldObj.CompName_t,
+        symbol: oldObj.Ticker_t,
+        type: oldObj.exchInstname_s,
+      };
+      symbolSearchOptionArray.push(newObj);
+    }
+  }
+  console.log("dad ", symbolSearchOptionArray);
+  return symbolSearchOptionArray;
+};
+
+const makeSearchApiCall = async (query: string): Promise<any> => {
+  const endPoint = getApiEP("searchSymbol", `symbol=${query}`);
+  console.log("endpoint : ", endPoint);
+
+  const response = await fetch(endPoint);
+  const data = response.json();
+
+  return data;
+};
+
+const debouncedSearch = debounce(makeSearchApiCall, 300);
+
 let config: DatafeedConfiguration;
 
 const lastBarsCache = new Map();
@@ -133,13 +233,20 @@ export default {
     callback(timeResponse);
   },
 
-  searchSymbols: (
+  searchSymbols: async (
     userInput: string,
     exchange: string,
     symbolType: string,
-    onResult: SearchSymbolsCallback
+    onResultReadyCallback: SearchSymbolsCallback
   ) => {
-    console.log("[searchSymbols]: Method call", userInput);
+    console.log("[searchSymbols]: Method call", exchange, symbolType);
+    console.log("userInput : ", userInput);
+    const data = await debouncedSearch(userInput);
+
+    console.log("data : ", data?.data);
+    const newSymbols = constructSymbolSearchOptionForTradingView(data?.data);
+    console.log("newSymbols : ", newSymbols);
+    onResultReadyCallback(newSymbols);
   },
 
   resolveSymbol: async (
@@ -162,31 +269,8 @@ export default {
     }
 
     // Symbol information object
-    const symbolInfo: LibrarySymbolInfo = {
-      ticker: stockInformation.symbolToken as string,
-      name: stockInformation.symbol as string,
-      description: stockInformation.compName as string,
-      type: stockInformation.instName as string,
-      session: SESSION_TIME as string,
-      session_holidays: SESSION_HOLIDAYS as string,
-      timezone: TIMEZONE as Timezone,
-      exchange: stockInformation.exch as string,
-      listed_exchange: stockInformation.exch as string,
-
-      currency_code: CURRENCY_CODE as string,
-      minmov: 1 as number,
-      pricescale: 100 as number,
-
-      has_seconds: true as boolean,
-      has_intraday: true as boolean,
-      has_daily: true as boolean,
-      has_weekly_and_monthly: true as boolean,
-
-      visible_plots_set: "ohlcv" as VisiblePlotsSet,
-      supported_resolutions: SUPPORTED_RESOLUTIONS as ResolutionString[],
-      volume_precision: 2 as number,
-      format: "1/10/.../10000000" as SeriesFormat,
-    };
+    const symbolInfo: LibrarySymbolInfo =
+      constructSymbolObjectForTradingView(stockInformation);
 
     setTimeout(() => {
       onSymbolResolvedCallback(symbolInfo);
@@ -206,7 +290,9 @@ export default {
 
     const fromInNormalDateTime = convertEpochToDateTime(from);
     // As per trading-view  range getBars recieve : [from, to)
-    const toInNormalDateTime = convertEpochToDateTime(getToParameterForApiCall(to));
+    const toInNormalDateTime = convertEpochToDateTime(
+      getToParameterForApiCall(to)
+    );
     const transfromedResolution = transformResolutionAsPerBE(resolution);
 
     const TEST_FROM = "2019-10-15T05:30:00";
@@ -234,10 +320,13 @@ export default {
         onHistoryCallback([], { noData: true } as HistoryMetadata);
       }
 
-      bars = [...bars, ...constructDataForTradingViewApi(ticksData.data, from, to)];
-        
+      bars = [
+        ...bars,
+        ...constructDataForTradingViewApi(ticksData.data, from, to),
+      ];
+
       bars.reverse(); //culprit
- 
+
       if (symbolInfo && bars.length && firstDataRequest) {
         lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, {
           ...bars[bars.length - 1],

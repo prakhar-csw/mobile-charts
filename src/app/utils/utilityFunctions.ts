@@ -64,6 +64,28 @@ export const getApiEP = (key: string, params?: string): string => {
 
 export const getChannelString = (ticker: string): string => {
   const stockCode = ticker.split("_")[0];
-  const channelString = stockCode + '_' + EXCHANGE.NSE;
+  const channelString = stockCode + "_" + EXCHANGE.NSE;
   return channelString;
+};
+
+export const debounce = <T extends (...args: any[]) => Promise<any>>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => Promise<ReturnType<T>>) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  let promiseResolve: ((value: ReturnType<T>) => void) | null = null;
+
+  return (...args: Parameters<T>): Promise<ReturnType<T>> => {
+    return new Promise((resolve) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(async () => {
+        const result = await func(...args);
+        if (promiseResolve) {
+          promiseResolve(result);
+        }
+        resolve(result);
+      }, wait);
+      promiseResolve = resolve;
+    });
+  };
 };
