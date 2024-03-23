@@ -17,8 +17,8 @@ export const DEFAULT_TIME_FRAME = '1D';
 // export const SUPPORTED_RESOLUTIONS = ['5S','15S','30S','1','2','3','4','5','10','15','20','25','30','45','60','75','120','125','180','240','1D','1W'];
 
 export const CUSTOMIZED_TIME_FRAMES = [
-  { text: "5Y", resolution: "1W", description: "5 Years", title: "5Y" },
-  { text: "3Y", resolution: "1W", description: "3 Years", title: "3Y" },
+  { text: "4Y", resolution: "1D", description: "4 Years", title: "4Y" },
+  { text: "3Y", resolution: "1D", description: "3 Years", title: "3Y" },
   { text: "1y", resolution: "1D", description: "1 Year", title: "1Y" },
   { text: "6M", resolution: "1D", description: "6 Month", title: "6M" },
   { text: "3M", resolution: "1D", description: "3 Month", title: "3M" },
@@ -42,4 +42,4 @@ export const EXCHANGE: { [key: string]: string } = {
   BSE: "BSE",
 };
 
-export const SOCKET_PORT:number = 4000;
+export const SOCKET_ADDRESS:string = 'ws://localhost:4000';

@@ -325,8 +325,6 @@ export default {
         ...constructDataForTradingViewApi(ticksData.data, from, to),
       ];
 
-      bars.reverse(); //culprit
-
       if (symbolInfo && bars.length && firstDataRequest) {
         lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, {
           ...bars[bars.length - 1],
@@ -360,10 +358,6 @@ export default {
   },
 
   unsubscribeBars: (subscriberUID: string) => {
-    console.log(
-      "[unsubscribeBars]: Method call with subscriberUID:",
-      subscriberUID
-    );
     unsubscribeFromStream(subscriberUID);
   },
 };

@@ -13,7 +13,6 @@ export interface ChartModule {
 
 
 export function createChartModule(this: ChartModule): void{
-    this.dataFeedUrl = '';
     this.assetSymbol= '',
     this.element = React.createElement(
         'div',
@@ -21,13 +20,12 @@ export function createChartModule(this: ChartModule): void{
     );
 };
 
-createChartModule.prototype.init = function(this: ChartModule, dataFeedUrl: string, assetSymbol: string): void {
-    this.dataFeedUrl = dataFeedUrl;
+createChartModule.prototype.init = function(this: ChartModule, assetSymbol: string): void {
     this.assetSymbol = assetSymbol;
 };
 
 createChartModule.prototype.dataFeed= function(this: ChartModule): void {
-    initOnReady(this.dataFeedUrl, this.assetSymbol);
+    initOnReady(this.assetSymbol);
 };
 
 createChartModule.prototype.renderUI= function(this: ChartModule) : React.ReactElement {

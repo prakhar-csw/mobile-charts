@@ -16,7 +16,7 @@ import { CUSTOMIZED_TIME_FRAMES, DEFAULT_RESOLUTION, DEFAULT_TIME_FRAME, TIMEZON
 
 let tvWidget: any = null;
 
-export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
+export const initOnReady = (assetSymbol: string): void => {
 
   const widgetOptions: ChartingLibraryWidgetOptions = {
     //Widget configuration
@@ -28,7 +28,7 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
     interval: DEFAULT_RESOLUTION as ResolutionString,
     locale: <LanguageCode>getParameterByName("lang") || ("en" as string),
     timezone: TIMEZONE as Timezone,
-    timeframe: DEFAULT_TIME_FRAME as string,
+    // timeframe: DEFAULT_TIME_FRAME as string,
     time_frames: CUSTOMIZED_TIME_FRAMES as TimeFrameItem[],
 
     // Data configuration
@@ -39,7 +39,7 @@ export const initOnReady = (datafeedUrl: string, assetSymbol: string): void => {
     autosize: true as boolean,
 
     // UI configuration
-    theme: <ThemeName>getParameterByName("theme") || ("dark" as string),
+    theme: <ThemeName>getParameterByName("theme") || ("light" as string),
 
     // Chart features
     disabled_features: <ChartingLibraryFeatureset[]> [

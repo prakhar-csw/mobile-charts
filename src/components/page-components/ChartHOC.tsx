@@ -3,8 +3,8 @@ import React, { useEffect } from "react";
 
 
 interface ChartHOCProps {
-    dataFeedUrl: string,
     assetSymbol: string,
+    theme: string,
 };
 const ChartHOC: React.FC<ChartHOCProps> = (props) => {
     const chart = new (createChartModule as any)();
@@ -13,7 +13,7 @@ const ChartHOC: React.FC<ChartHOCProps> = (props) => {
         if(!props.assetSymbol)
             return;
     
-        chart.init(props.dataFeedUrl, props.assetSymbol);
+        chart.init(props.assetSymbol);
         chart.dataFeed();
         return ()=>{
             chart.remove();

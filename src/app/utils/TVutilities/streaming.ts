@@ -3,12 +3,10 @@ import { io } from "socket.io-client";
 import { getChannelString } from "../utilityFunctions";
 import {
   Bar,
-  IDatafeedChartApi,
   LibrarySymbolInfo,
-  QuotesCallback,
   SubscribeBarsCallback,
 } from "../../../../public/charting_library/charting_library";
-import { SOCKET_PORT } from "../constants";
+import { SOCKET_ADDRESS } from "../constants";
 
 interface IHandler {
   id: string;
@@ -24,17 +22,6 @@ interface ISubscriptionItem {
 
 const channelToSubscription = new Map<string, any>();
 
-let stock_channel: string = "";
-
-const setStockChannelName = (symbolInfo: LibrarySymbolInfo) => {
-  if (symbolInfo) {
-    const id = symbolInfo?.ticker?.split("_")[0];
-    stock_channel = `LTP-${id}-${symbolInfo.exchange}`;
-    console.log("stock_channel : ", stock_channel);
-  }
-};
-
-//Takes value in epoch.
 const getNextDailyBarTime = (barTime: number): number => {
   const date = new Date(barTime * 1000);
   date.setDate(date.getDate() + 1);
@@ -51,12 +38,12 @@ const getNextMinuteBarTime = (barTime: number): number =>{
   return nextMinuteEpoch;
 }
 
-const socket = io(`ws://localhost:${SOCKET_PORT}`, {
+const socket = io(SOCKET_ADDRESS, {
   transports: ["websocket"],
 });
 
 socket.on("connect", () => {
-  if (stock_channel) socket.emit("set_stock_channel_name", stock_channel);
+  console.log('socket connection established');
 });
 
 socket.on("disconnect", (reason) => {});
@@ -67,7 +54,8 @@ socket.on("error", (error) => {
 
 socket.on("message_from_redis", (data) => {
   const dataInJSON = JSON.parse(data);
-  // console.log("[socket] Message:", dataInJSON);
+
+  console.log('datat in json :' ,dataInJSON)
 
   const { symbol, ltp, chngPer, chng, close, timestamp, ltt } = dataInJSON;
 
@@ -75,9 +63,9 @@ socket.on("message_from_redis", (data) => {
   const tradeTime = parseInt(ltt);
   const channelString = getChannelString(symbol);
 
-  console.log("tradePrice : ", tradePrice,"tradeTime : ", tradeTime,"channel string : ", channelString);
-
   const subscriptionItem = channelToSubscription.get(channelString);
+
+  console.log('subscriptionItem : ',subscriptionItem);
 
   if (subscriptionItem === undefined) {
     return;
@@ -86,18 +74,20 @@ socket.on("message_from_redis", (data) => {
   const lastBar = subscriptionItem.lastDailyBar;
   const resolution = subscriptionItem.resolution;
 
-  console.log("lastBar : ", lastBar);
-
   if (!lastBar) return;
 
   let nextBarTime;
 
-  if(resolution === '1')
-    nextBarTime = getNextMinuteBarTime(lastBar?.time);
-  else 
-    nextBarTime = getNextDailyBarTime(lastBar?.time);
+  
 
-  console.log('nextBarTime : ', nextBarTime);
+  // handling minutes and days only.
+  if(resolution.includes('D'))
+    nextBarTime = getNextDailyBarTime(lastBar?.time);
+  else 
+    nextBarTime = getNextMinuteBarTime(lastBar?.time);
+
+
+  console.log('lastbar.time : ', lastBar?.time, 'nextBarTime : ', nextBarTime);
 
   let bar: Bar = {
     time: 0,
@@ -109,7 +99,6 @@ socket.on("message_from_redis", (data) => {
 
   try {
     if (tradeTime >= nextBarTime) {
-      console.log("in if");
       bar = {
         time: nextBarTime,
         open: tradePrice,
@@ -118,7 +107,6 @@ socket.on("message_from_redis", (data) => {
         close: tradePrice,
       };
     } else {
-      console.log("in else");
       bar = {
         ...lastBar,
         high: Math.max(lastBar?.high, tradePrice),
@@ -131,13 +119,22 @@ socket.on("message_from_redis", (data) => {
   }
   subscriptionItem.lastDailyBar = bar;
 
-  console.log("bar generated : ", bar);
+  console.log('bar ',bar);
 
   // Send data to every subscriber of that symbol
   subscriptionItem.handlers.forEach((handler: IHandler) =>
     handler.subscribeBarCallBack(bar as Bar)
   );
 });
+
+const setStockChannelToSocket = (symbolInfo: LibrarySymbolInfo) => {
+  if (symbolInfo) {
+    const id = symbolInfo?.ticker?.split("_")[0];
+    const stock_channel = `LTP-${id}-${symbolInfo.exchange}`;
+    const stock_symbol = `${id}_${symbolInfo.exchange}`;
+    socket.emit("set_stock_channel_name", {stock_channel : stock_channel, stock_symbol: stock_symbol});
+  }
+};
 
 export function subscribeOnStream(
   symbolInfo: LibrarySymbolInfo,
@@ -147,13 +144,13 @@ export function subscribeOnStream(
   onResetCacheNeededCallback: () => void,
   lastDailyBar: Bar
 ) {
-  console.log("symbolInfo : ", symbolInfo);
-  setStockChannelName(symbolInfo);
+  
+  setStockChannelToSocket(symbolInfo);
+  console.log('lastDailyBar: ',lastDailyBar)
+  
   console.log("subscriberUid : ", subscriberUID); // 3456_1_#_INR_#_1D
 
   const channelString = getChannelString("" + subscriberUID);
-
-  console.log("channel String : ", channelString);
 
   // Construct a handler object.
   const handler: IHandler = {

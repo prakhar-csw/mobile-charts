@@ -3,11 +3,10 @@ import ChartUI from "@/components/page-components/ChartUI";
 import { DATA_FEED_URL } from "../utils/constants";
 
 const page = () => {
-  const dataFeedUrl = DATA_FEED_URL;
   return (
-    <main className="h-full flex flex-col">
+    <main className="h-full flex flex-col bg-[#F0F4FF]">
       <Script strategy="beforeInteractive" src="datafeeds/udf/dist/bundle.js" />
-      <ChartUI dataFeedUrl={dataFeedUrl} marketUpColor="" marketDownColor="" />
+      <ChartUI marketUpColor="" marketDownColor="" />
     </main>
   );
 };
