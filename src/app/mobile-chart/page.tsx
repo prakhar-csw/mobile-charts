@@ -1,6 +1,5 @@
 import Script from "next/script";
 import ChartUI from "@/components/page-components/ChartUI";
-import { DATA_FEED_URL } from "../utils/constants";
 
 const page = () => {
   return (
