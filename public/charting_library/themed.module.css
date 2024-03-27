@@ -1,0 +1,11 @@
+button[data-name="logarithm"] {
+    display: none;
+}
+
+button[data-name="percentage"] {
+    display: none;
+}
+
+button[data-name="open-indicators-dialog"]>div {
+    display: none;
+}

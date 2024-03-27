@@ -8,7 +8,7 @@ export const CURRENCY_CODE = "INR";
 
 export const SESSION_TIME = "0915-1530";
 
-export const SUPPORTED_RESOLUTIONS = ["5S", "15S", "1", "1D"];
+export const SUPPORTED_RESOLUTIONS = ["5S", "15S","30S", "1", "1D"];
 
 export const DEFAULT_RESOLUTION = "1";
 
@@ -42,4 +42,6 @@ export const EXCHANGE: { [key: string]: string } = {
   BSE: "BSE",
 };
 
-export const SOCKET_ADDRESS:string = 'ws://localhost:4000';
+// export const SOCKET_ADDRESS:string = 'ws://localhost:4000';
+
+export const SOCKET_ADDRESS:string = 'wss://ltjclsjd-4000.inc1.devtunnels.ms/';

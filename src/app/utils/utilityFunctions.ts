@@ -89,3 +89,47 @@ export const debounce = <T extends (...args: any[]) => Promise<any>>(
     });
   };
 };
+
+
+export const addIntervalToEpoch = (epochTime: number, resolution: string) => {
+  // Convert epoch time to seconds if it's in milliseconds
+  if (String(epochTime).length === 13) {
+      epochTime = Math.floor(epochTime / 1000);
+  }
+
+  let numericalValue = parseInt(resolution.slice(0, -1)); // Extract numerical value
+  let unit:string = resolution.slice(-1); // Extract unit
+  
+  // If no numerical value is provided then consider it as 1.
+  if(isNaN(numericalValue)){
+    numericalValue = 1;
+  }
+  
+  // In case of minute resolution string does not contain any suffix.
+  if(!isNaN(parseInt(unit))){
+      numericalValue = numericalValue * 10 + parseInt(unit);
+      unit = '';
+  }
+
+  let nextEpoch;
+
+  if (unit === 'S') {
+      nextEpoch = epochTime + numericalValue; // Add seconds
+  } else if (unit === 'D') {
+      const date = new Date(epochTime * 1000);
+      date.setDate(date.getDate() + numericalValue); // Add days
+      nextEpoch = date.getTime() / 1000;
+  } else if (unit === 'W') {
+      const date = new Date(epochTime * 1000);
+      date.setDate(date.getDate() + (7 * numericalValue)); // Add weeks (7 days)
+      nextEpoch = date.getTime() / 1000;
+  } else if (unit === 'M') {
+      const date = new Date(epochTime * 1000);
+      const nextMonthDate = new Date(date.getFullYear(), date.getMonth() + numericalValue, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
+      nextEpoch = nextMonthDate.getTime() / 1000; // Add months
+  } else {
+      nextEpoch = epochTime + (60 * numericalValue); // Add minutes
+  }
+
+  return nextEpoch;
+}

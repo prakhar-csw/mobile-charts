@@ -13,18 +13,18 @@ const ChartUI = (props: any) => {
   const [dataRecieved, setDataRecieved] = useState<any>({});
 
   useEffect(() => {
-    // window.addEventListener("message", (event) => {
-    //   console.log("data recieved : ", event.data);
-    //   setDataRecieved(event.data);
+    window.addEventListener("message", (event) => {
+      console.log("data recieved : ", event.data);
+      setDataRecieved(event.data);
       
-    //   const symbol = event?.data?.symObj?.symbol;
-    //   const theme = event?.data?.symObj?.theme;
+      const symbol = event?.data?.symObj?.symbol;
+      const theme = event?.data?.symObj?.theme;
 
-    //   setAssetSymbol(symbol);
-    //   setTheme(theme);
-    // });
+      setAssetSymbol(symbol);
+      setTheme(theme);
+    });
 
-    setAssetSymbol('BANDHANBNK');
+    // setAssetSymbol('BANDHANBNK');
   }, []);
 
   return (

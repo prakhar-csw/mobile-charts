@@ -39,7 +39,7 @@ export const initOnReady = (assetSymbol: string): void => {
     datafeed: DataFeed as any,
 
     // Chart Size
-    fullscreen: false as boolean,
+    fullscreen: true as boolean,
     autosize: true as boolean,
 
     // UI configuration
@@ -49,25 +49,26 @@ export const initOnReady = (assetSymbol: string): void => {
     disabled_features: (<ChartingLibraryFeatureset[]>[
       "show_percent_option_for_right_margin",
       "header_layouttoggle",
-      "main_series_scale_menu",
-      "screen rotation",
+      // "main_series_scale_menu",
+      
       "chart_template_storage",
       "header_saveload",
       "header_fullscreen_button",
-      "header_undo_redo",
       "header_settings",
       "header_screenshot",
       "snapshot_trading_drawings",
       "header_compare",
       "header_symbol_search",
       "header_quick_search",
+      "symbol_search_hot_key",
       "left_toolbar",
       "use_localstorage_for_settings",
       "save_chart_properties_to_local_storage",
     ]) as ChartingLibraryFeatureset[],
     enabled_features: <ChartingLibraryFeatureset[]>[
+      "show_object_tree",
       "seconds_resolution",
-      "border_around_the_chart",
+      "border_around_the_chart","screen_rotation",
     ],
 
     // Saving and loading chart
@@ -75,28 +76,17 @@ export const initOnReady = (assetSymbol: string): void => {
     charts_storage_api_version: "1.1" as AvailableSaveloadVersions,
     client_id: "tradingview.com" as string,
     user_id: "public_user_id" as string,
-    // debug:true
+    custom_css_url:'./themed.module.css',
+    overrides: {
+      "mainSeriesProperties.priceAxisProperties.percentage": false,
+      "Chart.PriceScale.TogglePercentage":false,
+      "mainSeriesProperties.showPriceLine": false,
+    },
   };
 
   tvWidget = new widget(widgetOptions as any);
 
   tvWidget.onChartReady(function () {
-    tvWidget.headerReady().then(() => {
-      const button = tvWidget.createButton();
-      button.setAttribute("title", "Back Button");
-      button.classList.add("apply-common-tooltip");
-      button.addEventListener("click", () =>
-        tvWidget.showNoticeDialog({
-          title: "Notification",
-          body: "TradingView Charting Library API works correctly",
-          callback: () => {
-            console.log("Noticed!");
-          },
-        })
-      );
-
-      button.innerHTML = "Check API";
-    });
   });
   window.frames[0].focus();
 };

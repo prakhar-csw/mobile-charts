@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
       };
 
       redisPublisher.publish(channelName, JSON.stringify(data));
-    }, 5000);
+    }, 1000);
 
     // Subscribe to the channel
     redisSubscriber.subscribe(channelName, (err, count) => {

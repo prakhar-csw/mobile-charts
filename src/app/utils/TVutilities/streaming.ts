@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-import { getChannelString } from "../utilityFunctions";
+import { addIntervalToEpoch, getChannelString } from "../utilityFunctions";
 import {
   Bar,
   LibrarySymbolInfo,
@@ -46,7 +46,9 @@ socket.on("connect", () => {
   console.log('socket connection established');
 });
 
-socket.on("disconnect", (reason) => {});
+socket.on("disconnect", (reason) => {
+  console.log('socket connection demolished');
+});
 
 socket.on("error", (error) => {
   console.error("[socket] Error:", error);
@@ -74,18 +76,13 @@ socket.on("message_from_redis", (data) => {
   const lastBar = subscriptionItem.lastDailyBar;
   const resolution = subscriptionItem.resolution;
 
+
+
+  console.log('resolution : ',resolution,'\nlastBarTime : ', lastBar?.time);
+
   if (!lastBar) return;
 
-  let nextBarTime;
-
-  
-
-  // handling minutes and days only.
-  if(resolution.includes('D'))
-    nextBarTime = getNextDailyBarTime(lastBar?.time);
-  else 
-    nextBarTime = getNextMinuteBarTime(lastBar?.time);
-
+  let nextBarTime = addIntervalToEpoch(lastBar?.time, resolution);
 
   console.log('lastbar.time : ', lastBar?.time, 'nextBarTime : ', nextBarTime);
 
