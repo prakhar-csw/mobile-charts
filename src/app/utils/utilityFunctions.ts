@@ -97,7 +97,7 @@ export const addIntervalToEpoch = (epochTime: number, resolution: string) => {
       epochTime = Math.floor(epochTime / 1000);
   }
 
-  let numericalValue = parseInt(resolution.slice(0, -1)); // Extract numerical value
+  let numericalValue:number = parseInt(resolution.slice(0, -1)); // Extract numerical value
   let unit:string = resolution.slice(-1); // Extract unit
   
   // If no numerical value is provided then consider it as 1.
@@ -107,7 +107,7 @@ export const addIntervalToEpoch = (epochTime: number, resolution: string) => {
   
   // In case of minute resolution string does not contain any suffix.
   if(!isNaN(parseInt(unit))){
-      numericalValue = numericalValue * 10 + parseInt(unit);
+      // numericalValue = numericalValue * 10 + parseInt(unit);
       unit = '';
   }
 
@@ -131,5 +131,5 @@ export const addIntervalToEpoch = (epochTime: number, resolution: string) => {
       nextEpoch = epochTime + (60 * numericalValue); // Add minutes
   }
 
-  return nextEpoch;
+  return nextEpoch * 1000;
 }

@@ -57,8 +57,6 @@ socket.on("error", (error) => {
 socket.on("message_from_redis", (data) => {
   const dataInJSON = JSON.parse(data);
 
-  console.log('datat in json :' ,dataInJSON)
-
   const { symbol, ltp, chngPer, chng, close, timestamp, ltt } = dataInJSON;
 
   const tradePrice = parseFloat(ltp);
@@ -67,8 +65,6 @@ socket.on("message_from_redis", (data) => {
 
   const subscriptionItem = channelToSubscription.get(channelString);
 
-  console.log('subscriptionItem : ',subscriptionItem);
-
   if (subscriptionItem === undefined) {
     return;
   }
@@ -76,15 +72,9 @@ socket.on("message_from_redis", (data) => {
   const lastBar = subscriptionItem.lastDailyBar;
   const resolution = subscriptionItem.resolution;
 
-
-
-  console.log('resolution : ',resolution,'\nlastBarTime : ', lastBar?.time);
-
   if (!lastBar) return;
 
   let nextBarTime = addIntervalToEpoch(lastBar?.time, resolution);
-
-  console.log('lastbar.time : ', lastBar?.time, 'nextBarTime : ', nextBarTime);
 
   let bar: Bar = {
     time: 0,
@@ -143,9 +133,8 @@ export function subscribeOnStream(
 ) {
   
   setStockChannelToSocket(symbolInfo);
-  console.log('lastDailyBar: ',lastDailyBar)
   
-  console.log("subscriberUid : ", subscriberUID); // 3456_1_#_INR_#_1D
+  // console.log("subscriberUid : ", subscriberUID); // 3456_1_#_INR_#_1D
 
   const channelString = getChannelString("" + subscriberUID);
 
@@ -158,16 +147,10 @@ export function subscribeOnStream(
   let subscriptionItem: ISubscriptionItem =
     channelToSubscription.get(channelString);
 
-  if (subscriptionItem) {
-    // Already subscribed to the channel, use the existing subscription
-    subscriptionItem.handlers.push(handler);
-    return;
-  }
-
   subscriptionItem = {
     subscriberUID,
     resolution,
-    lastDailyBar,
+    lastDailyBar:lastDailyBar,
     handlers: [handler],
   };
 
