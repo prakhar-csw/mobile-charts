@@ -22,22 +22,6 @@ interface ISubscriptionItem {
 
 const channelToSubscription = new Map<string, any>();
 
-const getNextDailyBarTime = (barTime: number): number => {
-  const date = new Date(barTime * 1000);
-  date.setDate(date.getDate() + 1);
-  return date.getTime() / 1000;
-};
-
-const getNextMinuteBarTime = (barTime: number): number =>{
-  if (String(barTime).length === 13) {
-    barTime = Math.floor(barTime / 1000);
-  }
-  let nextMinuteEpoch = barTime + 60;
-  nextMinuteEpoch *= 1000;
-
-  return nextMinuteEpoch;
-}
-
 const socket = io(SOCKET_ADDRESS, {
   transports: ["websocket"],
 });

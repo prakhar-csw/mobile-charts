@@ -107,8 +107,9 @@ export const addIntervalToEpoch = (epochTime: number, resolution: string) => {
   
   // In case of minute resolution string does not contain any suffix.
   if(!isNaN(parseInt(unit))){
-      // numericalValue = numericalValue * 10 + parseInt(unit);
-      unit = '';
+    if(resolution.length > 1)
+      numericalValue = numericalValue * 10 + parseInt(unit);
+    unit = '';
   }
 
   let nextEpoch;
