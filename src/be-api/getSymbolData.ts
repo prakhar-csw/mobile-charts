@@ -1,28 +1,22 @@
+import { IRequestBody, IStockInformation } from "@/app/utils/TVutilities";
+import { getRequestBody, makePostRequest } from "@/app/utils/utilityFunctions";
+
 export const getSymbolData = async (symbol: string) => {
   const url =
-    "https://ie-uat.coinswitch.co/cskservices-market/Search/SymbolSearch/1.0.0";
-  const body = {
-    request: {
-      data: {
-        searchString: symbol,
-      },
-      appID: "a2be9deacaff095ec897e5f1488198a9",
-    },
-  };
+    `${process.env.HOST}/Search/SymbolSearch/1.0.0`;
+  const body : IRequestBody = getRequestBody({
+    searchString: symbol,
+  });
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
+    const response = await makePostRequest(url, {
       headers: {
-        "Content-Type": "application/json",
-        "X-ENCRYPT": "false",
-        // Add any additional headers if needed 
+        'X-ENCRYPT': 'false',
       },
-      body: JSON.stringify(body),
+      body: body,
     });
 
-    const responseData = await response.json();
-    const stockInfo = responseData?.response?.data?.symbolList?.[0] || null;
+    const stockInfo : IStockInformation = response?.response?.data?.symbolList?.[0];
     return stockInfo;
   } catch (error) {
     console.error('Error happened while fetching the data');

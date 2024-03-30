@@ -1,27 +1,31 @@
-export const getTicks = async (symbol: string, start: string, end: string, interval: string) => {
-    const url = "https://ie-uat.coinswitch.co/cskservices-market/chart";
-    const body = {   
-        request: {
-            data: {
-                symbol: symbol,
-                start: start,
-                end: end,
-                interval: interval,
-            },
-            appID: 'a2be9deacaff095ec897e5f1488198a9'
-        }
-    };
+import { IRequestBody, ITicks } from "@/app/utils/TVutilities";
+import { getRequestBody, makePostRequest } from "@/app/utils/utilityFunctions";
 
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-         'Content-Type': 'application/json',
-         'X-ENCRYPT': 'false',
-        },
-        body: JSON.stringify(body),
-      });
+export const getTicks = async (
+  symbol: string,
+  start: string,
+  end: string,
+  interval: string
+) => {
+  const url = `${process.env.HOST}/chart`;
+  const body: IRequestBody = getRequestBody({
+    symbol: symbol,
+    start: start,
+    end: end,
+    interval: interval,
+  });
 
-    const responseData = await response.json();
-    const ticksInfo = responseData.response;
+  try {
+    const response = await makePostRequest(url, {
+      headers: {
+        "X-ENCRYPT": "false",
+      },
+      body: body,
+    });
+
+    const ticksInfo: ITicks = response.response;
     return ticksInfo;
- };
+  } catch (err) {
+    console.error("Error occured : ", err);
+  }
+};

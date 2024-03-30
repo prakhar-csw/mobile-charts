@@ -1,7 +1,3 @@
-export const DATA_FEED_URL = "http://localhost:3000/api";
-
-export const DUMMY_SYMBOL = "TATAMOTORS";
-
 export const TIMEZONE = "Asia/Kolkata";
 
 export const CURRENCY_CODE = "INR";
