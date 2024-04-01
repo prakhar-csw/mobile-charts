@@ -29,6 +29,7 @@ import {
   convertEpochToDateTime,
   debounce,
   getApiEP,
+  makeGetRequest,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
 
@@ -256,9 +257,7 @@ export default {
     extension?: SymbolResolveExtension
   ) => {
     const endPoint = getApiEP("symbols", `symbol=${symbolName}`);
-
-    const response = await fetch(endPoint);
-    const stockInformation = await response.json();
+    const stockInformation = await makeGetRequest(endPoint);
 
     if (!stockInformation) {
       console.log("[resolveSymbol]: Cannot resolve symbol", symbolName);
@@ -305,9 +304,7 @@ export default {
         "history",
         `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=${transfromedResolution}`
       );
-      const response = await fetch(endPoint);
-
-      const ticksData = await response.json();
+      const ticksData = await makeGetRequest(endPoint);
 
       if (ticksData.infoMsg === "Request Failed;") {
         console.log(

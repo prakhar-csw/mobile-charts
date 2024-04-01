@@ -3,7 +3,7 @@ import { getRequestBody, makePostRequest } from "@/app/utils/utilityFunctions";
 
 export const getSymbolData = async (symbol: string) => {
   const url =
-    `${process.env.HOST}/Search/SymbolSearch/1.0.0`;
+    `${process.env.NEXT_PUBLIC_HOST}/Search/SymbolSearch/1.0.0`;
   const body : IRequestBody = getRequestBody({
     searchString: symbol,
   });

@@ -1,4 +1,4 @@
-import { createChartModule, ChartModule } from "@/app/utils/chartFunction";
+import { createChartModule } from "@/app/utils/chartFunction";
 import React, { useEffect } from "react";
 
 
@@ -13,7 +13,7 @@ const ChartHOC: React.FC<ChartHOCProps> = (props) => {
         if(!props.assetSymbol)
             return;
     
-        chart.init(props.assetSymbol);
+        chart.init(props.assetSymbol, props.theme);
         chart.dataFeed();
         return ()=>{
             chart.remove();

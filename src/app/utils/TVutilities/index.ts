@@ -21,7 +21,7 @@ import {
 
 let tvWidget: any = null;
 
-export const initOnReady = (assetSymbol: string): void => {
+export const initOnReady = (assetSymbol: string, theme: string): void => {
   const widgetOptions: ChartingLibraryWidgetOptions = {
     //Widget configuration
     container: "tv_chart_container" as string,
@@ -43,7 +43,7 @@ export const initOnReady = (assetSymbol: string): void => {
     autosize: true as boolean,
 
     // UI configuration
-    theme: <ThemeName>getParameterByName("theme") || ("light" as string),
+    theme: <ThemeName>getParameterByName("theme") || (theme as string),
 
     // Chart features
     disabled_features: (<ChartingLibraryFeatureset[]>[

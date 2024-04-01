@@ -35,7 +35,7 @@ export async function GET (request: NextRequest){
             err : 'Please provide the symbol',
         });
     }
-    const stockInformation : StockInformationInterface = await getSymbolData(symbol);
+    const stockInformation : StockInformationInterface | undefined = await getSymbolData(symbol);
     return NextResponse.json(stockInformation);
 }
 

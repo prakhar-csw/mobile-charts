@@ -7,7 +7,7 @@ export const getTicks = async (
   end: string,
   interval: string
 ) => {
-  const url = `${process.env.HOST}/chart`;
+  const url = `${process.env.NEXT_PUBLIC_HOST}/chart`;
   const body: IRequestBody = getRequestBody({
     symbol: symbol,
     start: start,
