@@ -14,8 +14,8 @@ const ChartUI = (props: any) => {
     //   console.log("data recieved : ", event.data);
     //   setDataRecieved(event.data);
       
-    //   const symbol = event?.data?.symObj?.symbol;
-    //   const theme = event?.data?.symObj?.theme;
+    //   const symbol = event?.data?.data?.symObj?.symbol;
+    //   const theme = event?.data?.data?.symObj?.theme;
 
     //   setAssetSymbol(symbol);
     //   setTheme(theme);
@@ -26,6 +26,7 @@ const ChartUI = (props: any) => {
 
   return (
     <ChartContext.Provider value={undefined}>
+      {/* {console.log('data : ',data)} */}
       <ChartHOC assetSymbol={assetSymbol} theme={theme}/>
     </ChartContext.Provider>
   );

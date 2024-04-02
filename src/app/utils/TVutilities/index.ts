@@ -51,7 +51,6 @@ export const initOnReady = (assetSymbol: string, theme: string): void => {
     disabled_features: (<ChartingLibraryFeatureset[]>[
       "show_percent_option_for_right_margin",
       "header_layouttoggle",
-      
       "chart_template_storage",
       "header_saveload",
       "header_fullscreen_button",

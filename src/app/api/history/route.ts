@@ -3,22 +3,6 @@ import { convertEpochToDateTime } from "../../../app/utils/utilityFunctions";
 import { getTicks } from "../../../be-api/getTicks";
 import { NextRequest, NextResponse } from "next/server";
 
-export interface TicksInterface {
-  infoID: string;
-  data: {
-    c: number[];
-    t: number[];
-    sym: string;
-    v: number[];
-    h: number[];
-    l: number[];
-    o: number[];
-  };
-  infoMsg: string;
-  msgID: string;
-  serverTime: string;
-}
-
 export async function GET(request: NextRequest) {
   const symbol = request.nextUrl.searchParams.get("symbol") || "";
   const from = request.nextUrl.searchParams.get("from") || "";
