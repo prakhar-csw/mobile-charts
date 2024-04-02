@@ -40,13 +40,13 @@ export interface IStockInformation {
 export interface ITicks {
   infoID: string;
   data: {
-    c: number[];
-    t: number[];
-    sym: string;
-    v: number[];
-    h: number[];
-    l: number[];
-    o: number[];
+    c?: number[];
+    t?: number[];
+    sym?: string;
+    v?: number[];
+    h?: number[];
+    l?: number[];
+    o?: number[];
   };
   infoMsg: string;
   msgID: string;

@@ -29,9 +29,13 @@ import {
   convertEpochToDateTime,
   debounce,
   getApiEP,
+  getTimeFrameForRespectiveResolution,
   makeGetRequest,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
+
+let previousTime: number;
+let previousResolution: string;
 
 interface IOHLCVT {
   o: number[];
@@ -75,6 +79,11 @@ interface ISymbolSearchOption {
   full_name: string;
   symbol: string;
   type: string;
+}
+
+interface ITime {
+  _to: number,
+  _from: number,
 }
 
 const checkDataLengthIsSame = (data: IOHLCVT): boolean => {
@@ -149,6 +158,7 @@ const constructSymbolObjectForTradingView = (
     description: stockInformation.compName as string,
     type: stockInformation.instName as string,
     session: SESSION_TIME as string,
+    session_display: SESSION_TIME as string,
     session_holidays: SESSION_HOLIDAYS as string,
     timezone: TIMEZONE as Timezone,
     exchange: stockInformation.exch as string,
@@ -165,8 +175,10 @@ const constructSymbolObjectForTradingView = (
 
     visible_plots_set: "ohlcv" as VisiblePlotsSet,
     supported_resolutions: SUPPORTED_RESOLUTIONS as ResolutionString[],
+    intraday_multipliers: ["1"],
+    monthly_multipliers: ["1"],
     volume_precision: 2 as number,
-    format: "1/10/.../10000000" as SeriesFormat,
+    format: "price" as SeriesFormat,
   };
 
   return symbolInfo;
@@ -209,6 +221,45 @@ const debouncedSearch = debounce(makeSearchApiCall, 300);
 let config: DatafeedConfiguration;
 
 const lastBarsCache = new Map();
+
+const isFromAndToInNonMarketHours = (from: number, to: number) => {
+  const fromDate = new Date(from * 1000);
+  const toDate = new Date(to * 1000);
+
+  const isWeekend =
+    (fromDate.getDay() === 0 || fromDate.getDay() === 6) &&
+    (toDate.getDay() === 0 || toDate.getDay() === 6);
+  const isNonMarketHours =
+    ((fromDate.getHours() < 9 && fromDate.getMinutes() < 15) ||
+      (fromDate.getHours() > 15 && fromDate.getMinutes() > 30)) &&
+    ((toDate.getHours() < 9 && toDate.getMinutes() < 15) ||
+      (toDate.getHours() > 15 && toDate.getMinutes() > 30));
+
+  return isWeekend || isNonMarketHours;
+};
+
+const getNDayPreviousEpoch = (epoch: number, n: number) => {
+  const nDaysInSeconds = n * 24 * 60 * 60;
+  return epoch - nDaysInSeconds;
+};
+
+const getCorrectTime = (to: number, from: number, resolution: string) : ITime => {
+  let _to = to, _from = from;
+
+  if(!previousResolution)
+    previousResolution = resolution;
+
+  if(previousResolution !== resolution) {
+    previousResolution = resolution;
+    _to = to;
+  } else {
+    _to = !previousTime ? to : previousTime;
+  }
+  _from = getNDayPreviousEpoch(_to, getTimeFrameForRespectiveResolution(resolution));
+  previousTime = _from;
+
+  return {_to, _from};
+};
 
 export default {
   onReady: async (onReadyCallBack: OnReadyCallback) => {
@@ -283,28 +334,28 @@ export default {
     onHistoryCallback: HistoryCallback,
     onErrorCallback: ErrorCallback
   ) => {
-    // Giving data in seconds
-    const { from, to, firstDataRequest } = periodParams;
     let bars = <Bar[]>[];
-
-    const fromInNormalDateTime = convertEpochToDateTime(from);
-    // As per trading-view  range getBars recieve : [from, to)
-    const toInNormalDateTime = convertEpochToDateTime(
-      getToParameterForApiCall(to)
-    );
+    // Giving data in seconds
+    const { from, to, firstDataRequest, countBack } = periodParams;
+    let { _to, _from} : ITime = getCorrectTime(to,from,resolution);
     const transfromedResolution = transformResolutionAsPerBE(resolution);
 
-    const TEST_FROM = "2019-10-15T05:30:00";
-    const TEST_TO = "2024-03-18T14:09:16";
-    const TEST_RESOLUTION = "1d";
+    // As per trading-view  range getBars recieve : [from, to)
+    const fromInNormalDateTime = convertEpochToDateTime(_from);
+    const toInNormalDateTime = convertEpochToDateTime(
+      getToParameterForApiCall(_to)
+    );
 
+    // console.log('previous : ',previous,'\n_to : ',_to,'\ntoInNormalDateTime',toInNormalDateTime,'\n_from:',_from,'\nfromInNormalDateTime : ',fromInNormalDateTime,'\ncountback : ',countBack);
+    
     try {
-      // const endPoint = getApiEP('history', `symbol=${symbolInfo.ticker}&from=${TEST_FROM}&to=${TEST_TO}&resolution=${TEST_RESOLUTION}`);
       const endPoint = getApiEP(
         "history",
         `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=${transfromedResolution}`
       );
-      const ticksData = await makeGetRequest(endPoint);
+      const response = await fetch(endPoint);
+
+      const ticksData = await response.json();
 
       if (ticksData.infoMsg === "Request Failed;") {
         console.log(
@@ -317,18 +368,13 @@ export default {
         onHistoryCallback([], { noData: true } as HistoryMetadata);
       }
 
-      bars = [
-        ...bars,
-        ...constructDataForTradingViewApi(ticksData.data, from, to),
-      ];
+      bars = constructDataForTradingViewApi(ticksData.data, _from, _to);
 
       if (symbolInfo && bars.length && firstDataRequest) {
         lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, {
           ...bars[bars.length - 1],
         });
       }
-
-      console.log("bars : ", bars);
 
       onHistoryCallback(bars, { noData: false } as HistoryMetadata);
     } catch (error) {

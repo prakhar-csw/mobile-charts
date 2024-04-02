@@ -1,3 +1,4 @@
+import { ITicks } from "@/app/utils/TVutilities";
 import { convertEpochToDateTime } from "../../../app/utils/utilityFunctions";
 import { getTicks } from "../../../be-api/getTicks";
 import { NextRequest, NextResponse } from "next/server";
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
   const resolution = request.nextUrl.searchParams.get("resolution") || "";
 
   try {
-    const ticketInfo: TicksInterface | undefined = await getTicks(
+    const ticketInfo: ITicks | undefined = await getTicks(
       symbol,
       from,
       to,

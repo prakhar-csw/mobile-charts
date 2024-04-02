@@ -20,7 +20,7 @@ export const CUSTOMIZED_TIME_FRAMES = [
   { text: "3M", resolution: "1D", description: "3 Month", title: "3M" },
   { text: "1M", resolution: "60", description: "1 Month", title: "1M" },
   { text: "1W", resolution: "30", description: "1 Week", title: "1W" },
-  { text: "1D", resolution: "1", description: "3 Day", title: "1D" },
+  { text: "1D", resolution: "1", description: "1 Day", title: "1D" },
 ];
 
 export const SESSION_HOLIDAYS =

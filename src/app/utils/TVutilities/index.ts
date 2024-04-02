@@ -32,11 +32,13 @@ export const initOnReady = (assetSymbol: string, theme: string): void => {
     interval: DEFAULT_RESOLUTION as ResolutionString,
     locale: <LanguageCode>getParameterByName("lang") || ("en" as string),
     timezone: TIMEZONE as Timezone,
-    // timeframe: DEFAULT_TIME_FRAME as string,
+    timeframe: DEFAULT_TIME_FRAME as string,
     time_frames: CUSTOMIZED_TIME_FRAMES as TimeFrameItem[],
-
     // Data configuration
     datafeed: DataFeed as any,
+    time_scale: {
+      min_bar_spacing: 20,
+    },
 
     // Chart Size
     fullscreen: true as boolean,
@@ -49,7 +51,6 @@ export const initOnReady = (assetSymbol: string, theme: string): void => {
     disabled_features: (<ChartingLibraryFeatureset[]>[
       "show_percent_option_for_right_margin",
       "header_layouttoggle",
-      // "main_series_scale_menu",
       
       "chart_template_storage",
       "header_saveload",
@@ -66,9 +67,12 @@ export const initOnReady = (assetSymbol: string, theme: string): void => {
       "save_chart_properties_to_local_storage",
     ]) as ChartingLibraryFeatureset[],
     enabled_features: <ChartingLibraryFeatureset[]>[
+      "tick_resolution",
       "show_object_tree",
       "seconds_resolution",
       "border_around_the_chart","screen_rotation",
+      "studies_extend_time_scale",
+      "disable_resolution_rebuild",
     ],
 
     // Saving and loading chart

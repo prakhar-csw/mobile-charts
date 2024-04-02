@@ -151,7 +151,6 @@ export const getRequestBody = (data: object): IRequestBody => {
   };
 };
 
-
 export async function makeGetRequest(url: string, options?: IRequestOptions): Promise<any> {
   try {
     const response = await fetch(url, {
@@ -191,3 +190,12 @@ export async function makePostRequest(url: string, options?: IRequestOptions): P
     throw error;
   }
 }
+
+export const getTimeFrameForRespectiveResolution = (resolution : string) => {
+  if(resolution.includes('D'))
+    return 10; // 10 Days
+  if(resolution.includes('S'))
+    return 1/24; // 1 Hour
+  else 
+    return 1; // 1 Day
+};
