@@ -90,8 +90,6 @@ socket.on("message_from_redis", (data) => {
   }
   subscriptionItem.lastDailyBar = bar;
 
-  console.log('bar ',bar);
-
   // Send data to every subscriber of that symbol
   subscriptionItem.handlers.forEach((handler: IHandler) =>
     handler.subscribeBarCallBack(bar as Bar)

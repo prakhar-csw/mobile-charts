@@ -1,5 +1,5 @@
 import React from "react";
-import { initOnReady, removeWhenExit } from "./TVutilities";
+import { initOnReady, removeWhenExit } from "./TVutilities/index";
 
 export interface ChartModule {
     theme: string,

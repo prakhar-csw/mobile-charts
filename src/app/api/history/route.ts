@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   const resolution = request.nextUrl.searchParams.get("resolution") || "";
 
   try {
-    const ticketInfo: TicksInterface = await getTicks(
+    const ticketInfo: TicksInterface | undefined = await getTicks(
       symbol,
       from,
       to,
