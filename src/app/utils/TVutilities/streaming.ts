@@ -27,11 +27,11 @@ const socket = io(SOCKET_ADDRESS, {
 });
 
 socket.on("connect", () => {
-  console.log('socket connection established');
+  console.log("socket connection established");
 });
 
 socket.on("disconnect", (reason) => {
-  console.log('socket connection demolished');
+  console.log("socket connection demolished");
 });
 
 socket.on("error", (error) => {
@@ -41,22 +41,25 @@ socket.on("error", (error) => {
 socket.on("message_from_redis", (data) => {
   const dataInJSON = JSON.parse(data);
 
-  const { symbol, ltp, chngPer, chng, close, timestamp, ltt } = dataInJSON;
+  let { symbol, ltp, chngPer, chng, close, timestamp, ltt } = dataInJSON;
 
-  const tradePrice = parseFloat(ltp);
-  const tradeTime = parseInt(ltt);
   const channelString = getChannelString(symbol);
-
   const subscriptionItem = channelToSubscription.get(channelString);
 
   if (subscriptionItem === undefined) {
     return;
   }
 
+  const _timeStamp = new Date(timestamp);
+  const tradeTime = Math.floor(_timeStamp.getTime());
+  let tradePrice = parseFloat(ltp);
+
   const lastBar = subscriptionItem.lastDailyBar;
   const resolution = subscriptionItem.resolution;
 
-  if (!lastBar) return;
+  if (!lastBar) {
+    return;
+  }
 
   let nextBarTime = addIntervalToEpoch(lastBar?.time, resolution);
 
@@ -67,6 +70,11 @@ socket.on("message_from_redis", (data) => {
     low: 0,
     close: 0,
   };
+
+  // If the trade price in the live tick is not there means no change from previous price.
+  if (!tradePrice) {
+    tradePrice = lastBar?.close;
+  }
 
   try {
     if (tradeTime >= nextBarTime) {
@@ -85,10 +93,10 @@ socket.on("message_from_redis", (data) => {
         close: tradePrice,
       };
     }
+    subscriptionItem.lastDailyBar = bar;
   } catch (err) {
     console.error("Error is : ", err);
   }
-  subscriptionItem.lastDailyBar = bar;
 
   // Send data to every subscriber of that symbol
   subscriptionItem.handlers.forEach((handler: IHandler) =>
@@ -101,7 +109,10 @@ const setStockChannelToSocket = (symbolInfo: LibrarySymbolInfo) => {
     const id = symbolInfo?.ticker?.split("_")[0];
     const stock_channel = `LTP-${id}-${symbolInfo.exchange}`;
     const stock_symbol = `${id}_${symbolInfo.exchange}`;
-    socket.emit("set_stock_channel_name", {stock_channel : stock_channel, stock_symbol: stock_symbol});
+    socket.emit("set_stock_channel_name", {
+      stock_channel: stock_channel,
+      stock_symbol: stock_symbol,
+    });
   }
 };
 
@@ -113,13 +124,8 @@ export function subscribeOnStream(
   onResetCacheNeededCallback: () => void,
   lastDailyBar: Bar
 ) {
-  
   setStockChannelToSocket(symbolInfo);
-  
-  // console.log("subscriberUid : ", subscriberUID); // 3456_1_#_INR_#_1D
-
   const channelString = getChannelString("" + subscriberUID);
-
   // Construct a handler object.
   const handler: IHandler = {
     id: subscriberUID,
@@ -132,7 +138,7 @@ export function subscribeOnStream(
   subscriptionItem = {
     subscriberUID,
     resolution,
-    lastDailyBar:lastDailyBar,
+    lastDailyBar: lastDailyBar,
     handlers: [handler],
   };
 

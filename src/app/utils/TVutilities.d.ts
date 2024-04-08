@@ -120,3 +120,53 @@ export interface ISubscriptionItem {
   lastDailyBar: Bar;
   handlers: IHandler[];
 }
+
+
+interface IOHLCVT {
+  o: number[];
+  h: number[];
+  l: number[];
+  c: number[];
+  v: number[];
+  t: number[];
+}
+
+interface IStockInformation {
+  symbol: string;
+  dispPriceTick: string;
+  lotSize: string;
+  multiplier: number;
+  streamSym: string;
+  nIssueRate: number;
+  assetClass: string;
+  sectorName: string;
+  compName: string;
+  token: string;
+  divisor: string;
+  mktSegId: string;
+  coCode: string;
+  marketCapType: string;
+  series: string;
+  exch: string;
+  expiry: string;
+  id: string;
+  instName: string;
+  surveillanceMsg: string;
+  symbolToken: string;
+  strikePrice: string;
+  isin: string;
+  option: string;
+}
+
+interface ISymbolSearchOption {
+  description: string;
+  exchange: string;
+  full_name: string;
+  symbol: string;
+  type: string;
+}
+
+interface ITime {
+  _to: number;
+  _from: number;
+}

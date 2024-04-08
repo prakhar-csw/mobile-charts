@@ -37,7 +37,7 @@ export const initOnReady = (assetSymbol: string, theme: string): void => {
     // Data configuration
     datafeed: DataFeed as any,
     time_scale: {
-      min_bar_spacing: 20,
+      min_bar_spacing: 10,
     },
 
     // Chart Size

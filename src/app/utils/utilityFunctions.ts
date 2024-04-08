@@ -175,6 +175,7 @@ export async function makePostRequest(url: string, options?: IRequestOptions): P
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-ENCRYPT': 'false',
         ...options?.headers,
       },
       body: JSON.stringify(options?.body),
@@ -193,7 +194,7 @@ export async function makePostRequest(url: string, options?: IRequestOptions): P
 
 export const getTimeFrameForRespectiveResolution = (resolution : string) => {
   if(resolution.includes('D'))
-    return 10; // 10 Days
+    return 180; // 90 Days
   if(resolution.includes('S'))
     return 1/24; // 1 Hour
   else 

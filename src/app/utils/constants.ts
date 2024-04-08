@@ -40,4 +40,4 @@ export const EXCHANGE: { [key: string]: string } = {
 
 // export const SOCKET_ADDRESS:string = 'ws://localhost:4000';
 
-export const SOCKET_ADDRESS:string = 'wss://ltjclsjd-4000.inc1.devtunnels.ms/';
+export const SOCKET_ADDRESS:string = 'wss://ltjclsjd-8080.inc1.devtunnels.ms/';

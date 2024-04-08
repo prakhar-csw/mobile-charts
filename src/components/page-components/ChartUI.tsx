@@ -12,21 +12,21 @@ const ChartUI = (props: any) => {
   useEffect(() => {
     // window.addEventListener("message", (event) => {
     //   console.log("data recieved : ", event.data);
-    //   setDataRecieved(event.data);
+    //   const dataRecievedFromApp = event.data?.data;
+
+    //   setDataRecieved(dataRecievedFromApp);
       
-    //   const symbol = event?.data?.data?.symObj?.symbol;
-    //   const theme = event?.data?.data?.symObj?.theme;
+    //   const symbol = dataRecievedFromApp.symObj?.symbol;
+    //   const theme = dataRecievedFromApp?.theme;
 
     //   setAssetSymbol(symbol);
     //   setTheme(theme);
     // });
-
-    setAssetSymbol('BANDHANBNK');
+    setAssetSymbol('TATAMOTORS');
   }, []);
 
   return (
     <ChartContext.Provider value={undefined}>
-      {/* {console.log('data : ',data)} */}
       <ChartHOC assetSymbol={assetSymbol} theme={theme}/>
     </ChartContext.Provider>
   );

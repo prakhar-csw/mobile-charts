@@ -32,58 +32,10 @@ import {
   getTimeFrameForRespectiveResolution,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
+import { IOHLCVT, IStockInformation, ISymbolSearchOption, ITime } from "../TVutilities";
 
 let previousTime: number;
 let previousResolution: string;
-
-interface IOHLCVT {
-  o: number[];
-  h: number[];
-  l: number[];
-  c: number[];
-  v: number[];
-  t: number[];
-}
-
-interface IStockInformation {
-  symbol: string;
-  dispPriceTick: string;
-  lotSize: string;
-  multiplier: number;
-  streamSym: string;
-  nIssueRate: number;
-  assetClass: string;
-  sectorName: string;
-  compName: string;
-  token: string;
-  divisor: string;
-  mktSegId: string;
-  coCode: string;
-  marketCapType: string;
-  series: string;
-  exch: string;
-  expiry: string;
-  id: string;
-  instName: string;
-  surveillanceMsg: string;
-  symbolToken: string;
-  strikePrice: string;
-  isin: string;
-  option: string;
-}
-
-interface ISymbolSearchOption {
-  description: string;
-  exchange: string;
-  full_name: string;
-  symbol: string;
-  type: string;
-}
-
-interface ITime {
-  _to: number;
-  _from: number;
-}
 
 const checkDataLengthIsSame = (data: IOHLCVT): boolean => {
   if (data && data?.o && data?.h && data?.l && data?.c && data?.v && data?.t) {
@@ -357,8 +309,6 @@ export default {
     const toInNormalDateTime = convertEpochToDateTime(
       getToParameterForApiCall(_to)
     );
-
-    // console.log('previous : ',previous,'\n_to : ',_to,'\ntoInNormalDateTime',toInNormalDateTime,'\n_from:',_from,'\nfromInNormalDateTime : ',fromInNormalDateTime,'\ncountback : ',countBack);
 
     try {
       const endPoint = getApiEP(

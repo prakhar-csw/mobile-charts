@@ -16,17 +16,11 @@ export const getTicks = async (
   });
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-       'Content-Type': 'application/json',
-       'X-ENCRYPT': 'false',
-      },
-      body: JSON.stringify(body),
+    const response = await makePostRequest(url, {
+      body: body,
     });
-
-    const responseData = await response.json();
-    const ticksInfo: ITicks = responseData.response;
+    
+    const ticksInfo: ITicks = response.response;
     return ticksInfo;
   } catch (err) {
     console.error("Error occured : ", err);
