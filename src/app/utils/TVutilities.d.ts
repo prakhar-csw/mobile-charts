@@ -122,7 +122,7 @@ export interface ISubscriptionItem {
 }
 
 
-interface IOHLCVT {
+export interface IOHLCVT {
   o: number[];
   h: number[];
   l: number[];
@@ -131,7 +131,7 @@ interface IOHLCVT {
   t: number[];
 }
 
-interface IStockInformation {
+export interface IStockInformation {
   symbol: string;
   dispPriceTick: string;
   lotSize: string;
@@ -158,7 +158,7 @@ interface IStockInformation {
   option: string;
 }
 
-interface ISymbolSearchOption {
+export interface ISymbolSearchOption {
   description: string;
   exchange: string;
   full_name: string;
@@ -166,7 +166,56 @@ interface ISymbolSearchOption {
   type: string;
 }
 
-interface ITime {
+export interface ITime {
   _to: number;
   _from: number;
+}
+
+export interface IHandler {
+  id: string;
+  subscribeBarCallBack: SubscribeBarsCallback;
+}
+
+export interface ISubscriptionItem {
+  subscriberUID: string;
+  resolution: string;
+  lastDailyBar: Bar;
+  handlers: IHandler[];
+}
+
+export interface IChartModule {
+  theme: string,
+  assetSymbol: string,
+  element: React.ReactElement;
+  init(assetSymbol: string, theme: string): void;
+  dataFeed(): void;
+  renderUI(): React.ReactElement;
+  remove(): void;
+}
+
+export interface IStockInformationInterface {
+  symbol: string,
+  dispPriceTick: string,
+  lotSize: string,
+  multiplier: number,
+  streamSym: string,
+  nIssueRate: number,
+  assetClass: string,
+  sectorName: string,
+  compName: string,
+  token: string,
+  divisor: string,
+  mktSegId: string,
+  coCode: string,
+  marketCapType: string,
+  series: string,
+  exch: string,
+  expiry: string,
+  id: string,
+  instName: string,
+  surveillanceMsg: string,
+  symbolToken: string,
+  strikePrice: string,
+  isin: string,
+  option: string,
 }

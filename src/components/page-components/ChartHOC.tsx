@@ -2,11 +2,12 @@ import { createChartModule } from "@/app/utils/chartFunction";
 import React, { useEffect } from "react";
 
 
-interface ChartHOCProps {
+interface IChartHOCProps {
     assetSymbol: string,
     theme: string,
 };
-const ChartHOC: React.FC<ChartHOCProps> = (props) => {
+
+const ChartHOC: React.FC<IChartHOCProps> = (props) => {
     const chart = new (createChartModule as any)();
 
     useEffect(()=> {

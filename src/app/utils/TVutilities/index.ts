@@ -29,6 +29,7 @@ export const initOnReady = (assetSymbol: string, theme: string): void => {
 
     // Chart Configuration
     symbol: assetSymbol as string,
+    symbol_search_request_delay: 300,
     interval: DEFAULT_RESOLUTION as ResolutionString,
     locale: <LanguageCode>getParameterByName("lang") || ("en" as string),
     timezone: TIMEZONE as Timezone,

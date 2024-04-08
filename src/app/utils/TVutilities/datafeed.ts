@@ -30,6 +30,7 @@ import {
   debounce,
   getApiEP,
   getTimeFrameForRespectiveResolution,
+  makeGetRequest,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
 import { IOHLCVT, IStockInformation, ISymbolSearchOption, ITime } from "../TVutilities";
@@ -161,8 +162,7 @@ const makeSearchApiCall = async (query: string): Promise<any> => {
   const endPoint = getApiEP("searchSymbol", `symbol=${query}`);
   console.log("endpoint : ", endPoint);
 
-  const response = await fetch(endPoint);
-  const data = response.json();
+  const data = await makeGetRequest(endPoint);;
 
   return data;
 };
@@ -224,8 +224,7 @@ export default {
   onReady: async (onReadyCallBack: OnReadyCallback) => {
     const endPoint = getApiEP("config");
 
-    const response = await fetch(endPoint);
-    const configurationData = await response.json();
+    const configurationData = await makeGetRequest(endPoint);
 
     config = configurationData;
 
@@ -238,9 +237,8 @@ export default {
     }
     const endPoint = getApiEP("time");
 
-    const response = await fetch(endPoint);
     // TimeResponse in seconds.
-    const timeResponse = await response.json();
+    const timeResponse = await makeGetRequest(endPoint);
     callback(timeResponse);
   },
 
@@ -268,8 +266,7 @@ export default {
   ) => {
     const endPoint = getApiEP("symbols", `symbol=${symbolName}`);
     try {
-      const response = await fetch(endPoint);
-      const stockInformation = await response.json();
+      const stockInformation = await makeGetRequest(endPoint);
 
       if (!stockInformation) {
         console.log("[resolveSymbol]: Cannot resolve symbol", symbolName);
@@ -315,9 +312,7 @@ export default {
         "history",
         `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=${transfromedResolution}`
       );
-      const response = await fetch(endPoint);
-
-      const ticksData = await response.json();
+      const ticksData = await makeGetRequest(endPoint);
 
       if (ticksData.infoMsg === "Request Failed;") {
         console.log(

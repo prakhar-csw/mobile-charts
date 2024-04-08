@@ -1,4 +1,4 @@
-export interface TradingViewItem {
+export interface ITradingViewItem {
   d_exch_t: string;
   exp_type_s: string;
   ISIN_code_s: string;
@@ -42,13 +42,13 @@ export interface TradingViewItem {
   LOT_UNITS_s: string;
 }
 
-export interface ApiResponse {
+export interface IApiResponse {
   code: string;
   remarks: string;
-  data: TradingViewItem[];
+  data: ITradingViewItem[];
 }
 
-export const dummySearchResult: ApiResponse = {
+export const dummySearchResult: IApiResponse = {
   code: "0",
   remarks: "S",
   data: [

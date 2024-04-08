@@ -1,18 +1,8 @@
 import React from "react";
 import { initOnReady, removeWhenExit } from "./TVutilities/index";
+import { IChartModule } from "./TVutilities";
 
-export interface ChartModule {
-    theme: string,
-    assetSymbol: string,
-    element: React.ReactElement;
-    init(assetSymbol: string, theme: string): void;
-    dataFeed(): void;
-    renderUI(): React.ReactElement;
-    remove(): void;
-}
-
-
-export function createChartModule(this: ChartModule): void{
+export function createChartModule(this: IChartModule): void{
     this.assetSymbol= '',
     this.element = React.createElement(
         'div',
@@ -20,16 +10,16 @@ export function createChartModule(this: ChartModule): void{
     );
 };
 
-createChartModule.prototype.init = function(this: ChartModule, assetSymbol: string, theme: string): void {
+createChartModule.prototype.init = function(this: IChartModule, assetSymbol: string, theme: string): void {
     this.assetSymbol = assetSymbol;
     this.theme = theme;
 };
 
-createChartModule.prototype.dataFeed= function(this: ChartModule): void {
+createChartModule.prototype.dataFeed= function(this: IChartModule): void {
     initOnReady(this.assetSymbol, this.theme);
 };
 
-createChartModule.prototype.renderUI= function(this: ChartModule) : React.ReactElement {
+createChartModule.prototype.renderUI= function(this: IChartModule) : React.ReactElement {
     return this.element;
 };
 

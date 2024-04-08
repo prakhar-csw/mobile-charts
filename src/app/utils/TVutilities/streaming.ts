@@ -6,23 +6,11 @@ import {
   LibrarySymbolInfo,
   SubscribeBarsCallback,
 } from "../../../../public/charting_library/charting_library";
-import { SOCKET_ADDRESS } from "../constants";
-
-interface IHandler {
-  id: string;
-  subscribeBarCallBack: SubscribeBarsCallback;
-}
-
-interface ISubscriptionItem {
-  subscriberUID: string;
-  resolution: string;
-  lastDailyBar: Bar;
-  handlers: IHandler[];
-}
+import { IHandler, ISubscriptionItem } from "../TVutilities";
 
 const channelToSubscription = new Map<string, any>();
 
-const socket = io(SOCKET_ADDRESS, {
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_ADDRESS as string, {
   transports: ["websocket"],
 });
 
