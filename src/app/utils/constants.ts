@@ -37,3 +37,7 @@ export const EXCHANGE: { [key: string]: string } = {
   NSE: "NSE",
   BSE: "BSE",
 };
+
+export const IE_ACCESS_TOKEN = 'ieAccessToken';
+
+export const IE_APP_ID = 'ieAppId';

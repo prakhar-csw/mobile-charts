@@ -19,6 +19,7 @@ import { PeriodParamsWithOptionalCountback } from "../../../../public/datafeeds/
 import { subscribeOnStream, unsubscribeFromStream } from "./streaming";
 import {
   CURRENCY_CODE,
+  IE_ACCESS_TOKEN,
   SESSION_HOLIDAYS,
   SESSION_TIME,
   SUPPORTED_RESOLUTIONS,
@@ -29,14 +30,23 @@ import {
   convertEpochToDateTime,
   debounce,
   getApiEP,
+  getNDayPreviousEpoch,
   getTimeFrameForRespectiveResolution,
   makeGetRequest,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
-import { IOHLCVT, IStockInformation, ISymbolSearchOption, ITime } from "../TVutilities";
+import {
+  IOHLCVT,
+  IStockInformation,
+  ISymbolSearchOption,
+  ITime,
+} from "../TVutilities";
+import { getCookie } from "../storageHelper";
 
 let previousTime: number;
 let previousResolution: string;
+let config: DatafeedConfiguration;
+const lastBarsCache = new Map();
 
 const checkDataLengthIsSame = (data: IOHLCVT): boolean => {
   if (data && data?.o && data?.h && data?.l && data?.c && data?.v && data?.t) {
@@ -154,46 +164,18 @@ const constructSymbolSearchOptionForTradingView = (
       symbolSearchOptionArray.push(newObj);
     }
   }
-  console.log("dad ", symbolSearchOptionArray);
   return symbolSearchOptionArray;
 };
 
 const makeSearchApiCall = async (query: string): Promise<any> => {
   const endPoint = getApiEP("searchSymbol", `symbol=${query}`);
-  console.log("endpoint : ", endPoint);
 
-  const data = await makeGetRequest(endPoint);;
+  const data = await makeGetRequest(endPoint); 
 
   return data;
 };
 
 const debouncedSearch = debounce(makeSearchApiCall, 300);
-
-let config: DatafeedConfiguration;
-
-const lastBarsCache = new Map();
-
-const isFromAndToInNonMarketHours = (from: number, to: number) => {
-  const fromDate = new Date(from * 1000);
-  const toDate = new Date(to * 1000);
-
-  const isWeekend =
-    (fromDate.getDay() === 0 || fromDate.getDay() === 6) &&
-    (toDate.getDay() === 0 || toDate.getDay() === 6);
-  
-  const isNonMarketHours =
-    ((fromDate.getHours() < 9 && fromDate.getMinutes() < 15) ||
-      (fromDate.getHours() > 15 && fromDate.getMinutes() > 30)) &&
-    ((toDate.getHours() < 9 && toDate.getMinutes() < 15) ||
-      (toDate.getHours() > 15 && toDate.getMinutes() > 30));
-
-  return isWeekend || isNonMarketHours;
-};
-
-const getNDayPreviousEpoch = (epoch: number, n: number) => {
-  const nDaysInSeconds = n * 24 * 60 * 60;
-  return epoch - nDaysInSeconds;
-};
 
 const getCorrectTime = (
   to: number,
@@ -347,17 +329,21 @@ export default {
     subscriberUID: string,
     onResetCacheNeededCallback: () => void
   ) => {
-    subscribeOnStream(
-      symbolInfo,
-      resolution,
-      onRealtimeCallback,
-      subscriberUID,
-      onResetCacheNeededCallback,
-      lastBarsCache.get(`${symbolInfo.exchange}:${symbolInfo.name}`)
-    );
+    if (getCookie(IE_ACCESS_TOKEN)) {
+      subscribeOnStream(
+        symbolInfo,
+        resolution,
+        onRealtimeCallback,
+        subscriberUID,
+        onResetCacheNeededCallback,
+        lastBarsCache.get(`${symbolInfo.exchange}:${symbolInfo.name}`)
+      );
+    }
   },
 
   unsubscribeBars: (subscriberUID: string) => {
-    unsubscribeFromStream(subscriberUID);
+    if (subscriberUID) {
+      unsubscribeFromStream(subscriberUID);
+    }
   },
 };

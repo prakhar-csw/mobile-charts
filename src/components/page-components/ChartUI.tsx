@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import ChartHOC from "./ChartHOC";
 import { ChartContext } from "@/app/utils/context/ChartContext";
+import { addCookie, removeCookie } from "@/app/utils/storageHelper";
+import { IE_ACCESS_TOKEN, IE_APP_ID } from "@/app/utils/constants";
 
 // Prodiver
 const ChartUI = (props: any) => {
@@ -10,19 +12,25 @@ const ChartUI = (props: any) => {
   const [dataRecieved, setDataRecieved] = useState<any>({});
 
   useEffect(() => {
-    // window.addEventListener("message", (event) => {
-    //   console.log("data recieved : ", event.data);
-    //   const dataRecievedFromApp = event.data?.data;
+    window.addEventListener("message", (event : MessageEvent<any>) : void => {
+      const dataRecievedFromApp = event.data?.params;
 
-    //   setDataRecieved(dataRecievedFromApp);
+      const {symObj = {}, ieAppId = '', ieAccessToken = '', theme = ''} = dataRecievedFromApp;
+
+      setDataRecieved(dataRecievedFromApp);
       
-    //   const symbol = dataRecievedFromApp.symObj?.symbol;
-    //   const theme = dataRecievedFromApp?.theme;
+      const symbol = symObj?.symbol;
+      setAssetSymbol(symbol);
+      setTheme(theme);
 
-    //   setAssetSymbol(symbol);
-    //   setTheme(theme);
-    // });
-    setAssetSymbol('TATAMOTORS');
+      addCookie(IE_APP_ID, ieAppId);
+      addCookie(IE_ACCESS_TOKEN, ieAccessToken);
+    });
+    // setAssetSymbol('TATAMOTORS');
+    return () => {
+      removeCookie('ieAppId');
+      removeCookie('ieAccessToken');
+    }
   }, []);
 
   return (

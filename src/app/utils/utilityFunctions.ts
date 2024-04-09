@@ -1,5 +1,6 @@
 import { IRequestBody, IRequestOptions } from "./TVutilities.d";
-import { EXCHANGE, RESOLUTION_MAPPING } from "./constants";
+import { EXCHANGE, IE_ACCESS_TOKEN, IE_APP_ID, RESOLUTION_MAPPING } from "./constants";
+import { getCookie } from "./storageHelper";
 
 export const getParameterByName = (name: string): string => {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -146,16 +147,21 @@ export const getRequestBody = (data: object): IRequestBody => {
   return {
     request: {
       data,
-      appId: process.env.APP_ID as string,
+      appId: '' as string,
     },
   };
 };
 
-export async function makeGetRequest(url: string, options?: IRequestOptions): Promise<any> {
+export const makeGetRequest = async (url: string, options?: IRequestOptions): Promise<any> => {
   try {
     const response = await fetch(url, {
       method: 'GET',
-      headers: options?.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-ENCRYPT': 'false',
+        'X-Auth-Key': getCookie(IE_ACCESS_TOKEN),
+        ...options?.headers,
+      },
     });
 
     if (!response.ok) {
@@ -169,7 +175,7 @@ export async function makeGetRequest(url: string, options?: IRequestOptions): Pr
   }
 }
 
-export async function makePostRequest(url: string, options?: IRequestOptions): Promise<any> {
+export const makePostRequest = async (url: string, options?: IRequestOptions): Promise<any> => {
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -200,3 +206,12 @@ export const getTimeFrameForRespectiveResolution = (resolution : string) => {
   else 
     return 1; // 1 Day
 };
+
+export const getNDayPreviousEpoch = (epoch: number, n: number) => {
+  const nDaysInSeconds = n * 24 * 60 * 60;
+  return epoch - nDaysInSeconds;
+};
+
+export const isDomLoaded = () : boolean => {
+  return typeof window !== 'undefined';
+}
