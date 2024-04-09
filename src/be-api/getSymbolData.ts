@@ -1,12 +1,9 @@
 import { IRequestBody, IStockInformation } from "@/app/utils/TVutilities";
 import { getRequestBody, makePostRequest } from "@/app/utils/utilityFunctions";
 
-export const getSymbolData = async (symbol: string) => {
+export const getSymbolData = async (body: IRequestBody) => {
   const url = `${process.env.NEXT_PUBLIC_HOST}/Search/Discovery/1.0.0`;
-  const body: IRequestBody = getRequestBody({
-    searchString: symbol,
-  });
-
+  
   try {
     const response = await makePostRequest(url, {
       body: body,

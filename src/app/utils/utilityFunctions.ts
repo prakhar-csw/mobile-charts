@@ -147,7 +147,7 @@ export const getRequestBody = (data: object): IRequestBody => {
   return {
     request: {
       data,
-      appId: '' as string,
+      appId: getCookie(IE_APP_ID) as string,
     },
   };
 };
@@ -159,7 +159,6 @@ export const makeGetRequest = async (url: string, options?: IRequestOptions): Pr
       headers: {
         'Content-Type': 'application/json',
         'X-ENCRYPT': 'false',
-        'X-Auth-Key': getCookie(IE_ACCESS_TOKEN),
         ...options?.headers,
       },
     });
@@ -182,6 +181,7 @@ export const makePostRequest = async (url: string, options?: IRequestOptions): P
       headers: {
         'Content-Type': 'application/json',
         'X-ENCRYPT': 'false',
+        'X-Auth-Key' : isDomLoaded() ? getCookie(IE_ACCESS_TOKEN) as string : '' as string,
         ...options?.headers,
       },
       body: JSON.stringify(options?.body),

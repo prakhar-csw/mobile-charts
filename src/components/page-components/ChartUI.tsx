@@ -27,9 +27,10 @@ const ChartUI = (props: any) => {
       addCookie(IE_ACCESS_TOKEN, ieAccessToken);
     });
     // setAssetSymbol('TATAMOTORS');
+    // addCookie(IE_ACCESS_TOKEN, 'some-random-token-value');
     return () => {
-      removeCookie('ieAppId');
-      removeCookie('ieAccessToken');
+      removeCookie(IE_APP_ID);
+      removeCookie(IE_ACCESS_TOKEN);
     }
   }, []);
 

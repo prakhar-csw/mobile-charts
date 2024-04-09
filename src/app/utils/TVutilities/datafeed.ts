@@ -31,8 +31,10 @@ import {
   debounce,
   getApiEP,
   getNDayPreviousEpoch,
+  getRequestBody,
   getTimeFrameForRespectiveResolution,
   makeGetRequest,
+  makePostRequest,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
 import {
@@ -246,9 +248,15 @@ export default {
     onResolveErrorCallback: ErrorCallback,
     extension?: SymbolResolveExtension
   ) => {
-    const endPoint = getApiEP("symbols", `symbol=${symbolName}`);
     try {
-      const stockInformation = await makeGetRequest(endPoint);
+      const endPoint = getApiEP('symbols');
+      const reqBody = getRequestBody({
+        searchString: symbolName,
+      });
+
+      const stockInformation = await makePostRequest(endPoint, {
+        body: reqBody,
+      }); 
 
       if (!stockInformation) {
         console.log("[resolveSymbol]: Cannot resolve symbol", symbolName);
@@ -290,11 +298,17 @@ export default {
     );
 
     try {
-      const endPoint = getApiEP(
-        "history",
-        `symbol=${symbolInfo.ticker}&from=${fromInNormalDateTime}&to=${toInNormalDateTime}&resolution=${transfromedResolution}`
-      );
-      const ticksData = await makeGetRequest(endPoint);
+      const endPoint = getApiEP('history');
+      const reqBody = getRequestBody({
+        symbol: symbolInfo.ticker,
+        start: fromInNormalDateTime,
+        end: toInNormalDateTime,
+        interval: transfromedResolution,
+      })
+
+      const ticksData = await makePostRequest(endPoint, {
+        body: reqBody,
+      });
 
       if (ticksData.infoMsg === "Request Failed;") {
         console.log(
