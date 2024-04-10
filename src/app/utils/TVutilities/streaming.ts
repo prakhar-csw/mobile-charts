@@ -10,7 +10,7 @@ import {
   LibrarySymbolInfo,
   SubscribeBarsCallback,
 } from "../../../../public/charting_library/charting_library";
-import { IHandler, ISubscriptionItem } from "../TVutilities";
+import { IHandler, ISubscriptionItem } from "../TVutilities/TVutilities.d";
 import { getCookie } from "../storageHelper";
 import { IE_ACCESS_TOKEN } from "../constants";
 import { Socket } from "socket.io-client";

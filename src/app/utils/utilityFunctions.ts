@@ -1,5 +1,16 @@
-import { IRequestBody, IRequestOptions } from "./TVutilities.d";
-import { EXCHANGE, IE_ACCESS_TOKEN, IE_APP_ID, RESOLUTION_MAPPING } from "./constants";
+import { Bar } from "../../../public/charting_library/charting_library";
+import {
+  IOHLCVT,
+  IRequestBody,
+  IRequestOptions,
+  ISymbolSearchOption,
+} from "./TVutilities/TVutilities";
+import {
+  EXCHANGE,
+  IE_ACCESS_TOKEN,
+  IE_APP_ID,
+  RESOLUTION_MAPPING,
+} from "./constants";
 import { getCookie } from "./storageHelper";
 
 export const getParameterByName = (name: string): string => {
@@ -59,7 +70,8 @@ export const transformResolutionAsPerBE = (resolution: string): string => {
 };
 
 export const getApiEP = (key: string, params?: string): string => {
-  let EP = `/api/${key}`;
+  let EP = `https://ltjclsjd-8080.inc1.devtunnels.ms/tv/${key}`;
+  // let EP = `/api/${key}`;
   if (params) EP = EP + "?" + params;
   return EP;
 };
@@ -152,59 +164,68 @@ export const getRequestBody = (data: object): IRequestBody => {
   };
 };
 
-export const makeGetRequest = async (url: string, options?: IRequestOptions): Promise<any> => {
+export const makeGetRequest = async (
+  url: string,
+  options?: IRequestOptions
+): Promise<any> => {
   try {
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'X-ENCRYPT': 'false',
+        "Content-Type": "application/json",
+        "X-ENCRYPT": "false",
         ...options?.headers,
       },
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch data: ${response.status} ${response.statusText}`
+      );
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error("Error fetching data:", error);
     throw error;
   }
-}
+};
 
-export const makePostRequest = async (url: string, options?: IRequestOptions): Promise<any> => {
+export const makePostRequest = async (
+  url: string,
+  options?: IRequestOptions
+): Promise<any> => {
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'X-ENCRYPT': 'false',
-        'X-Auth-Key' : isDomLoaded() ? getCookie(IE_ACCESS_TOKEN) as string : '' as string,
+        "Content-Type": "application/json",
+        "X-ENCRYPT": "false",
+        "X-Auth-Key": isDomLoaded()
+          ? (getCookie(IE_ACCESS_TOKEN) as string)
+          : ("" as string),
         ...options?.headers,
       },
       body: JSON.stringify(options?.body),
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to post data: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to post data: ${response.status} ${response.statusText}`
+      );
     }
 
     return response.json();
   } catch (error) {
-    console.error('Error posting data:', error);
+    console.error("Error posting data:", error);
     throw error;
   }
-}
+};
 
-export const getTimeFrameForRespectiveResolution = (resolution : string) => {
-  if(resolution.includes('D'))
-    return 180; // 90 Days
-  if(resolution.includes('S'))
-    return 1/24; // 1 Hour
-  else 
-    return 1; // 1 Day
+export const getTimeFrameForRespectiveResolution = (resolution: string) => {
+  if (resolution.includes("D")) return 180; // 180 Days
+  if (resolution.includes("S")) return 1 / 24; // 1 Hour
+  else return 1; // 1 Day
 };
 
 export const getNDayPreviousEpoch = (epoch: number, n: number) => {
@@ -212,6 +233,78 @@ export const getNDayPreviousEpoch = (epoch: number, n: number) => {
   return epoch - nDaysInSeconds;
 };
 
-export const isDomLoaded = () : boolean => {
-  return typeof window !== 'undefined';
-}
+export const isDomLoaded = (): boolean => {
+  return typeof window !== "undefined";
+};
+
+export const constructSymbolSearchOptionForTradingView = (
+  symbolSearchArrFromBE: any
+): ISymbolSearchOption[] => {
+  let symbolSearchOptionArray: ISymbolSearchOption[] = [];
+
+  if (symbolSearchArrFromBE) {
+    for (let i = 0; i < symbolSearchArrFromBE.length; i++) {
+      const oldObj = symbolSearchArrFromBE[i];
+      const newObj = {
+        description: oldObj.Seo_symbol_s,
+        exchange: oldObj._Exch_s,
+        full_name: oldObj.CompName_t,
+        symbol: oldObj.Ticker_t,
+        type: oldObj.exchInstname_s,
+      };
+      symbolSearchOptionArray.push(newObj);
+    }
+  }
+  return symbolSearchOptionArray;
+};
+
+export const checkDataLengthIsSame = (data: IOHLCVT): boolean => {
+  if (data && data?.o && data?.h && data?.l && data?.c && data?.v && data?.t) {
+    return areArraysEqualLength(
+      data?.o,
+      data?.h,
+      data?.l,
+      data?.c,
+      data?.v,
+      data?.t
+    );
+  } else {
+    return false;
+  }
+};
+
+export const constructDataForTradingViewApi = (
+  ticksData: IOHLCVT,
+  from: number,
+  to: number
+): Bar[] => {
+  const dataLengthIsSame = checkDataLengthIsSame(ticksData);
+  let bars = <Bar[]>[];
+  if (dataLengthIsSame) {
+    const length = ticksData?.c?.length;
+
+    const timeArr = ticksData?.t;
+    const openArr = ticksData?.o;
+    const highArr = ticksData?.h;
+    const lowArr = ticksData?.l;
+    const closeArr = ticksData?.c;
+    const volumeArr = ticksData?.v;
+
+    for (let i = 0; i < length; i++) {
+      console.log("from : ", from, "to : ", to);
+      console.log("timeArr[i] : ", timeArr[i]);
+      if (timeArr[i] >= from * 1000 && timeArr[i] < to * 1000) {
+        const newObj = {
+          time: timeArr[i],
+          low: lowArr[i],
+          high: highArr[i],
+          open: openArr[i],
+          close: closeArr[i],
+          volume: volumeArr[i],
+        };
+        bars.push(newObj);
+      }
+    }
+  }
+  return bars;
+};

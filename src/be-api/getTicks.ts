@@ -1,4 +1,4 @@
-import { IRequestBody, ITicks } from "@/app/utils/TVutilities";
+import { IRequestBody, ITicks } from "@/app/utils/TVutilities/TVutilities.d";
 import { getRequestBody, makePostRequest } from "@/app/utils/utilityFunctions";
 
 export const getTicks = async (body: IRequestBody) => {

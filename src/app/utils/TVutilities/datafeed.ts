@@ -27,6 +27,8 @@ import {
 } from "../constants";
 import {
   areArraysEqualLength,
+  constructDataForTradingViewApi,
+  constructSymbolSearchOptionForTradingView,
   convertEpochToDateTime,
   debounce,
   getApiEP,
@@ -42,29 +44,13 @@ import {
   IStockInformation,
   ISymbolSearchOption,
   ITime,
-} from "../TVutilities";
+} from "./TVutilities.d";
 import { getCookie } from "../storageHelper";
 
 let previousTime: number;
 let previousResolution: string;
 let config: DatafeedConfiguration;
 const lastBarsCache = new Map();
-
-const checkDataLengthIsSame = (data: IOHLCVT): boolean => {
-  if (data && data?.o && data?.h && data?.l && data?.c && data?.v && data?.t) {
-    return areArraysEqualLength(
-      data?.o,
-      data?.h,
-      data?.l,
-      data?.c,
-      data?.v,
-      data?.t
-    );
-  } else {
-    return false;
-  }
-};
-
 /**
  * Check if the epochTime is greater than the current Date-time.
  * @param epochTime
@@ -77,40 +63,6 @@ const getToParameterForApiCall = (epochTime: number): number => {
 
   if (toParamByTv >= currentDate) return currentDate / 1000;
   else return epochTime;
-};
-
-const constructDataForTradingViewApi = (
-  ticksData: IOHLCVT,
-  from: number,
-  to: number
-): Bar[] => {
-  const dataLengthIsSame = checkDataLengthIsSame(ticksData);
-  let bars = <Bar[]>[];
-  if (dataLengthIsSame) {
-    const length = ticksData?.c?.length;
-
-    const timeArr = ticksData?.t;
-    const openArr = ticksData?.o;
-    const highArr = ticksData?.h;
-    const lowArr = ticksData?.l;
-    const closeArr = ticksData?.c;
-    const volumeArr = ticksData?.v;
-
-    for (let i = 0; i < length; i++) {
-      if (timeArr[i] >= from * 1000 && timeArr[i] < to * 1000) {
-        const newObj = {
-          time: timeArr[i],
-          low: lowArr[i],
-          high: highArr[i],
-          open: openArr[i],
-          close: closeArr[i],
-          volume: volumeArr[i],
-        };
-        bars.push(newObj);
-      }
-    }
-  }
-  return bars;
 };
 
 const constructSymbolObjectForTradingView = (
@@ -148,27 +100,6 @@ const constructSymbolObjectForTradingView = (
   return symbolInfo;
 };
 
-const constructSymbolSearchOptionForTradingView = (
-  symbolSearchArrFromBE: any
-): ISymbolSearchOption[] => {
-  let symbolSearchOptionArray: ISymbolSearchOption[] = [];
-
-  if (symbolSearchArrFromBE) {
-    for (let i = 0; i < symbolSearchArrFromBE.length; i++) {
-      const oldObj = symbolSearchArrFromBE[i];
-      const newObj = {
-        description: oldObj.Seo_symbol_s,
-        exchange: oldObj._Exch_s,
-        full_name: oldObj.CompName_t,
-        symbol: oldObj.Ticker_t,
-        type: oldObj.exchInstname_s,
-      };
-      symbolSearchOptionArray.push(newObj);
-    }
-  }
-  return symbolSearchOptionArray;
-};
-
 const makeSearchApiCall = async (query: string): Promise<any> => {
   const endPoint = getApiEP("searchSymbol", `symbol=${query}`);
 
@@ -179,7 +110,7 @@ const makeSearchApiCall = async (query: string): Promise<any> => {
 
 const debouncedSearch = debounce(makeSearchApiCall, 300);
 
-const getCorrectTime = (
+const getCorrectTimeForGetBars = (
   to: number,
   from: number,
   resolution: string
@@ -223,7 +154,7 @@ export default {
 
     // TimeResponse in seconds.
     const timeResponse = await makeGetRequest(endPoint);
-    callback(timeResponse);
+    callback(timeResponse.time);
   },
 
   searchSymbols: async (
@@ -257,6 +188,7 @@ export default {
       const stockInformation = await makePostRequest(endPoint, {
         body: reqBody,
       }); 
+      console.log('stockInformation : ',stockInformation);
 
       if (!stockInformation) {
         console.log("[resolveSymbol]: Cannot resolve symbol", symbolName);
@@ -288,7 +220,7 @@ export default {
     let bars = <Bar[]>[];
     // Giving data in seconds
     const { from, to, firstDataRequest, countBack } = periodParams;
-    let { _to, _from }: ITime = getCorrectTime(to, from, resolution);
+    let { _to, _from }: ITime = getCorrectTimeForGetBars(to, from, resolution);
     const transfromedResolution = transformResolutionAsPerBE(resolution);
 
     // As per trading-view  range getBars recieve : [from, to)
@@ -310,6 +242,8 @@ export default {
         body: reqBody,
       });
 
+      console.log('ticksData : ',ticksData?.data?.c?.length);
+
       if (ticksData.infoMsg === "Request Failed;") {
         console.log(
           ticksData.infoMsg === "Request Failed;",
@@ -322,6 +256,10 @@ export default {
       }
 
       bars = constructDataForTradingViewApi(ticksData.data, _from, _to);
+
+      console.log('count-back : ',countBack);
+
+      console.log('bars : ',bars?.length);
 
       if (symbolInfo && bars.length && firstDataRequest) {
         lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, {

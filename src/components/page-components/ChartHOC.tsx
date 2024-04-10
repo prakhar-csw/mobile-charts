@@ -1,4 +1,4 @@
-import { createChartModule } from "@/app/utils/chartFunction";
+import { createChartModule } from "@/app/utils/TVutilities/chartFunction";
 import React, { useEffect } from "react";
 
 

@@ -1,4 +1,4 @@
-import { IRequestBody, IStockInformation } from "@/app/utils/TVutilities";
+import { IRequestBody, IStockInformation } from "@/app/utils/TVutilities/TVutilities.d";
 import { getRequestBody, makePostRequest } from "@/app/utils/utilityFunctions";
 
 export const getSymbolData = async (body: IRequestBody) => {

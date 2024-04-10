@@ -1,6 +1,6 @@
 import React from "react";
-import { initOnReady, removeWhenExit } from "./TVutilities/index";
-import { IChartModule } from "./TVutilities";
+import { initOnReady, removeWhenExit } from "./index";
+import { IChartModule } from "./TVutilities.d";
 
 export function createChartModule(this: IChartModule): void{
     this.assetSymbol= '',

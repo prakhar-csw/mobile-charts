@@ -1,4 +1,4 @@
-import { ApiResponse, dummySearchResult } from "@/mock-data/search-api-mock-data";
+import { IApiResponse, dummySearchResult } from "@/mock-data/search-api-mock-data";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -8,6 +8,6 @@ export async function GET(request: NextRequest) {
       err: "Please provide the symbol",
     });
   }
-  const searchResult: ApiResponse = dummySearchResult ;
+  const searchResult: IApiResponse = dummySearchResult ;
   return NextResponse.json(searchResult);
 }

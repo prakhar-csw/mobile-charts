@@ -1,4 +1,4 @@
-import { ITicks } from "@/app/utils/TVutilities";
+import { ITicks } from "@/app/utils/TVutilities/TVutilities.d";
 import { getTicks } from "../../../be-api/getTicks";
 import { NextRequest, NextResponse } from "next/server";
 

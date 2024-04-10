@@ -1,4 +1,4 @@
-import { IStockInformationInterface } from "@/app/utils/TVutilities";
+import { IStockInformationInterface } from "@/app/utils/TVutilities/TVutilities.d";
 import { getSymbolData } from "../../../be-api/getSymbolData";
 import { NextRequest, NextResponse } from "next/server";
 
