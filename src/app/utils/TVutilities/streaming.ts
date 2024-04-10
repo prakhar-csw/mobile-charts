@@ -1,10 +1,8 @@
 import { io } from "socket.io-client";
 
-import {
-  addIntervalToEpoch,
-  getChannelString,
-  isDomLoaded,
-} from "../utilityFunctions";
+import { isDomLoaded } from "../utilityFunctions";
+
+import { addIntervalToEpoch, getChannelString } from "./TVHelpers";
 import {
   Bar,
   LibrarySymbolInfo,
@@ -104,7 +102,6 @@ if (isDomLoaded()) {
     );
   });
 }
-
 
 const setStockChannelToSocket = (symbolInfo: LibrarySymbolInfo) => {
   if (symbolInfo) {

@@ -26,19 +26,25 @@ import {
   TIMEZONE,
 } from "../constants";
 import {
-  areArraysEqualLength,
-  constructDataForTradingViewApi,
-  constructSymbolSearchOptionForTradingView,
   convertEpochToDateTime,
   debounce,
-  getApiEP,
   getNDayPreviousEpoch,
-  getRequestBody,
-  getTimeFrameForRespectiveResolution,
-  makeGetRequest,
-  makePostRequest,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
+
+import {
+  constructDataForTradingViewApi,
+  constructSymbolSearchOptionForTradingView,
+  getTimeFrameForRespectiveResolution,
+} from "./TVHelpers";
+
+import {
+  getApiEP,
+  getRequestBody,
+  makeGetRequest,
+  makePostRequest,
+} from "../apiHelper";
+
 import {
   IOHLCVT,
   IStockInformation,
@@ -103,7 +109,7 @@ const constructSymbolObjectForTradingView = (
 const makeSearchApiCall = async (query: string): Promise<any> => {
   const endPoint = getApiEP("searchSymbol", `symbol=${query}`);
 
-  const data = await makeGetRequest(endPoint); 
+  const data = await makeGetRequest(endPoint);
 
   return data;
 };
@@ -180,15 +186,15 @@ export default {
     extension?: SymbolResolveExtension
   ) => {
     try {
-      const endPoint = getApiEP('symbols');
+      const endPoint = getApiEP("symbols");
       const reqBody = getRequestBody({
         searchString: symbolName,
       });
 
       const stockInformation = await makePostRequest(endPoint, {
         body: reqBody,
-      }); 
-      console.log('stockInformation : ',stockInformation);
+      });
+      console.log("stockInformation : ", stockInformation);
 
       if (!stockInformation) {
         console.log("[resolveSymbol]: Cannot resolve symbol", symbolName);
@@ -230,19 +236,19 @@ export default {
     );
 
     try {
-      const endPoint = getApiEP('history');
+      const endPoint = getApiEP("history");
       const reqBody = getRequestBody({
         symbol: symbolInfo.ticker,
         start: fromInNormalDateTime,
         end: toInNormalDateTime,
         interval: transfromedResolution,
-      })
+      });
 
       const ticksData = await makePostRequest(endPoint, {
         body: reqBody,
       });
 
-      console.log('ticksData : ',ticksData?.data?.c?.length);
+      console.log("ticksData : ", ticksData?.data?.c?.length);
 
       if (ticksData.infoMsg === "Request Failed;") {
         console.log(
@@ -257,9 +263,9 @@ export default {
 
       bars = constructDataForTradingViewApi(ticksData.data, _from, _to);
 
-      console.log('count-back : ',countBack);
+      console.log("count-back : ", countBack);
 
-      console.log('bars : ',bars?.length);
+      console.log("bars : ", bars?.length);
 
       if (symbolInfo && bars.length && firstDataRequest) {
         lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, {

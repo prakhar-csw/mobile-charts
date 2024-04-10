@@ -1,5 +1,5 @@
 import { IRequestBody, ITicks } from "@/app/utils/TVutilities/TVutilities.d";
-import { getRequestBody, makePostRequest } from "@/app/utils/utilityFunctions";
+import { makePostRequest } from "@/app/utils/apiHelper";
 
 export const getTicks = async (body: IRequestBody) => {
   const url = `${process.env.NEXT_PUBLIC_HOST}/chart`;
