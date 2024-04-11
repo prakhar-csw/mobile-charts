@@ -18,9 +18,9 @@ import {
   DEFAULT_TIME_FRAME,
   TIMEZONE,
 } from "../constants";
+import { attachBackButtonToTVHeader } from './TVHelpers';
 
 let tvWidget: any = null;
-
 export const initOnReady = (assetSymbol: string, theme: string): void => {
   const widgetOptions: ChartingLibraryWidgetOptions = {
     //Widget configuration
@@ -91,6 +91,10 @@ export const initOnReady = (assetSymbol: string, theme: string): void => {
   tvWidget = new widget(widgetOptions as any);
 
   tvWidget.onChartReady(function () {
+    tvWidget.headerReady()
+      .then(() => {
+        attachBackButtonToTVHeader(tvWidget);
+      });
   });
   window.frames[0].focus();
 };

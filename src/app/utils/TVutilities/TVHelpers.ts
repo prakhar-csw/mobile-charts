@@ -1,5 +1,5 @@
-import { Bar } from "../../../../public/charting_library/charting_library";
-import { EXCHANGE } from "../constants";
+import { Bar, CreateHTMLButtonOptions } from "../../../../public/charting_library/charting_library";
+import { BACK_BUTTON_SVG_STRING, EXCHANGE } from "../constants";
 import { areArraysEqualLength } from "../utilityFunctions";
 import { ISymbolSearchOption, IOHLCVT } from "./TVutilities";
 
@@ -133,3 +133,34 @@ export const constructDataForTradingViewApi = (
   }
   return bars;
 };
+
+export const attachBackButtonToTVHeader = (tvWidget : any) => {
+  const handleBackButtonClick = () => {
+    console.log('back buitton clicked');
+    (window as Window).ReactNativeWebView.postMessage('backButtonClicked');
+  }
+  const buttonOptions: CreateHTMLButtonOptions = {
+    align: 'left',
+    useTradingViewStyle: false
+  }
+
+  const button : HTMLButtonElement = tvWidget.createButton(buttonOptions);
+  const parser = new DOMParser();
+  const svgDoc = parser.parseFromString(BACK_BUTTON_SVG_STRING, "image/svg+xml");
+  const svgElement = svgDoc.documentElement;
+
+  button.setAttribute('id', 'back-button');
+  button.appendChild(svgElement);
+  button.addEventListener('click', handleBackButtonClick);
+
+  // Find its parent element with a class starting with 'group-'
+  const groupDiv = button?.closest('[class^="group-"]');
+  if(groupDiv) {
+
+    const separatorWrap = groupDiv?.nextElementSibling;
+    if (separatorWrap) 
+      separatorWrap.remove();
+    
+    (groupDiv as HTMLElement).style.order = '-2';
+  }
+}
