@@ -29,6 +29,7 @@ import {
   convertEpochToDateTime,
   debounce,
   getNDayPreviousEpoch,
+  isEpochGreaterThanFourYearsAgo,
   transformResolutionAsPerBE,
 } from "../utilityFunctions";
 
@@ -248,24 +249,18 @@ export default {
         body: reqBody,
       });
 
-      console.log("ticksData : ", ticksData?.data?.c?.length);
-
-      if (ticksData.infoMsg === "Request Failed;") {
+      if (ticksData.infoMsg === "Request Failed;" || isEpochGreaterThanFourYearsAgo(_from)) {
         console.log(
           ticksData.infoMsg === "Request Failed;",
           !ticksData?.data,
           !ticksData?.data?.t?.length
         );
-        console.log("Failed...");
+        console.error("Not much data found.");
 
         onHistoryCallback([], { noData: true } as HistoryMetadata);
       }
 
       bars = constructDataForTradingViewApi(ticksData.data, _from, _to);
-
-      console.log("count-back : ", countBack);
-
-      console.log("bars : ", bars?.length);
 
       if (symbolInfo && bars.length && firstDataRequest) {
         lastBarsCache.set(`${symbolInfo.exchange}:${symbolInfo.name}`, {
@@ -275,7 +270,7 @@ export default {
 
       onHistoryCallback(bars, { noData: false } as HistoryMetadata);
     } catch (error) {
-      console.log("[getBars]: Get error", error);
+      console.error("[getBars]: Get error", error);
       onErrorCallback(new Error(error as string) as DOMException);
     }
   },

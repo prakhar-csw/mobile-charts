@@ -26,19 +26,6 @@ export const areArraysEqualLength = (...arrays: any[][]): boolean => {
   return true; // All arrays have equal lengths
 };
 
-export const convertEpochToDateTime = (epochTime: number): string => {
-  const date = new Date(epochTime * 1000); // converting it in millisecond
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
-
-  const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-  return formattedDateTime;
-};
-
 export const transformResolutionAsPerBE = (resolution: string): string => {
   let modifiedResolution = "";
   const numericalValue = resolution.slice(0, -1) as string;
@@ -78,11 +65,31 @@ export const debounce = <T extends (...args: any[]) => Promise<any>>(
   };
 };
 
+export const isDomLoaded = (): boolean => {
+  return typeof window !== "undefined";
+};
+// Epoch related utility functions
+
+export const isEpochGreaterThanFourYearsAgo = (epoch: number): boolean => {
+  const epochYear = (new Date(epoch * 1000)).getFullYear();
+  const currentYear = (new Date()).getFullYear();
+  return currentYear - 4 > epochYear;
+};
+
+export const convertEpochToDateTime = (epochTime: number): string => {
+  const date = new Date(epochTime * 1000); // converting it in millisecond
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  return formattedDateTime;
+};
+
 export const getNDayPreviousEpoch = (epoch: number, n: number) => {
   const nDaysInSeconds = n * 24 * 60 * 60;
   return epoch - nDaysInSeconds;
-};
-
-export const isDomLoaded = (): boolean => {
-  return typeof window !== "undefined";
 };

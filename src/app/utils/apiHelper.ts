@@ -4,8 +4,8 @@ import { getCookie } from "./storageHelper";
 import { isDomLoaded } from "./utilityFunctions";
 
 export const getApiEP = (key: string, params?: string): string => {
-  // https://ltjclsjd-8080.inc1.devtunnels.ms/tv/config
-    let EP = `https://ltjclsjd-8080.inc1.devtunnels.ms/tv/${key}`;
+    // let EP = `${process.env.NEXT_PUBLIC_API_ADDRESS}${key}`;
+    let EP = `/api/${key}`;
     if (params) EP = EP + "?" + params;
     return EP;
   };
@@ -29,6 +29,9 @@ export const makeGetRequest = async (
       headers: {
         "Content-Type": "application/json",
         "X-ENCRYPT": "false",
+        "X-Auth-Key": isDomLoaded()
+          ? (getCookie(IE_ACCESS_TOKEN) as string)
+          : ("" as string),
         ...options?.headers,
       },
     });

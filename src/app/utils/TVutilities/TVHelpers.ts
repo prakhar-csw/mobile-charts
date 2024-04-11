@@ -61,7 +61,7 @@ export const addIntervalToEpoch = (epochTime: number, resolution: string) => {
 };
 
 export const getTimeFrameForRespectiveResolution = (resolution: string) => {
-  if (resolution.includes("D")) return 180; // 180 Days
+  if (resolution.includes("D")) return 365; // 365 Days
   if (resolution.includes("S")) return 1 / 24; // 1 Hour
   else return 1; // 1 Day
 };
@@ -120,9 +120,6 @@ export const constructDataForTradingViewApi = (
     const volumeArr = ticksData?.v;
 
     for (let i = 0; i < length; i++) {
-      console.log("from : ", from, "to : ", to);
-      console.log("timeArr[i] : ", timeArr[i]);
-      if (timeArr[i] >= from * 1000 && timeArr[i] < to * 1000) {
         const newObj = {
           time: timeArr[i],
           low: lowArr[i],
@@ -132,7 +129,6 @@ export const constructDataForTradingViewApi = (
           volume: volumeArr[i],
         };
         bars.push(newObj);
-      }
     }
   }
   return bars;
