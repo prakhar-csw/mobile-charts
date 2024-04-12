@@ -10,7 +10,7 @@ import {
 } from "../../../../public/charting_library/charting_library";
 import { IHandler, ISubscriptionItem } from "../TVutilities/TVutilities.d";
 import { getCookie } from "../storageHelper";
-import { IE_ACCESS_TOKEN } from "../constants";
+import { IE_ACCESS_TOKEN, IE_TRADE_PRICE_TYPE } from "../constants";
 import { Socket } from "socket.io-client";
 
 const channelToSubscription = new Map<string, any>();
@@ -106,7 +106,8 @@ if (isDomLoaded()) {
 const setStockChannelToSocket = (symbolInfo: LibrarySymbolInfo) => {
   if (symbolInfo) {
     const id = symbolInfo?.ticker?.split("_")[0];
-    const stock_channel = `LTP-${id}-${symbolInfo.exchange}`;
+    const tradeType = getCookie(IE_TRADE_PRICE_TYPE);
+    const stock_channel = `${tradeType}-${id}-${symbolInfo.exchange}`;
     const stock_symbol = `${id}_${symbolInfo.exchange}`;
     socket.emit("set_stock_channel_name", {
       stock_channel: stock_channel,

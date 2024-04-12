@@ -19,11 +19,12 @@ import { PeriodParamsWithOptionalCountback } from "../../../../public/datafeeds/
 import { subscribeOnStream, unsubscribeFromStream } from "./streaming";
 import {
   CURRENCY_CODE,
-  IE_ACCESS_TOKEN,
+  IE_TRADE_PRICE_TYPE,
   SESSION_HOLIDAYS,
   SESSION_TIME,
   SUPPORTED_RESOLUTIONS,
   TIMEZONE,
+  TRADE_TYPE,
 } from "../constants";
 import {
   convertEpochToDateTime,
@@ -282,7 +283,7 @@ export default {
     subscriberUID: string,
     onResetCacheNeededCallback: () => void
   ) => {
-    if (getCookie(IE_ACCESS_TOKEN)) {
+    if (getCookie(IE_TRADE_PRICE_TYPE) === TRADE_TYPE.LTP) {
       subscribeOnStream(
         symbolInfo,
         resolution,
