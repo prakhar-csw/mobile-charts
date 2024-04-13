@@ -12,25 +12,25 @@ const ChartUI = (props: any) => {
   const [dataRecieved, setDataRecieved] = useState<any>({});
 
   useEffect(() => {
-    // window.addEventListener("message", (event : MessageEvent<any>) : void => {
-    //   const dataRecievedFromApp = event.data?.params;
+    window.addEventListener("message", (event : MessageEvent<any>) : void => {
+      const dataRecievedFromApp = event.data?.params;
 
-    //   const {symObj = {}, ieAppId = '', accessToken = '', theme = '', tradePriceType = 'DLTP'} = dataRecievedFromApp;
+      const {symObj = {}, ieAppId = '', accessToken = '', theme = '', tradePriceType = 'DLTP'} = dataRecievedFromApp;
 
-    //   setDataRecieved(dataRecievedFromApp);
+      setDataRecieved(dataRecievedFromApp);
       
-    //   const symbol = symObj?.symbol;
-    //   setAssetSymbol(symbol);
-    //   setTheme(theme);
+      const symbol = symObj?.symbol;
+      setAssetSymbol(symbol);
+      setTheme(theme);
 
-    //   addCookie(IE_APP_ID, ieAppId);
-    //   addCookie(IE_ACCESS_TOKEN, accessToken);
-    //   addCookie(IE_TRADE_PRICE_TYPE, tradePriceType);
-    // });
-    setAssetSymbol('TATAMOTORS');
-    addCookie(IE_ACCESS_TOKEN, 'some-random-token-value');
-    addCookie(IE_APP_ID, 'some-random-appid-value');
-    addCookie(IE_TRADE_PRICE_TYPE, 'LTP');
+      addCookie(IE_APP_ID, ieAppId);
+      addCookie(IE_ACCESS_TOKEN, accessToken);
+      addCookie(IE_TRADE_PRICE_TYPE, tradePriceType);
+    });
+    // setAssetSymbol('TATAMOTORS');
+    // addCookie(IE_ACCESS_TOKEN, 'some-random-token-value');
+    // addCookie(IE_APP_ID, 'some-random-appid-value');
+    // addCookie(IE_TRADE_PRICE_TYPE, 'LTP');
     return () => {
       removeCookie(IE_APP_ID);
       removeCookie(IE_ACCESS_TOKEN);
